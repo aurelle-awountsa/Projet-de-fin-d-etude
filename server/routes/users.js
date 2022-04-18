@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const config = require('../config/database');
+const User = require('../models/users');
+const Users = require('../models/users').Users;
 
 
 router.get('/profile', (req, res) => {
@@ -16,7 +16,7 @@ router.get('/profile', (req, res) => {
 router.post('/register', (req, res) => {
     // console.log(req.body);
     //return res.json( req.body);
-    let newUser = new User({
+    let newUser = new Users({
         name: req.body.name,
         username: req.body.username,
         email: req.body.email,
@@ -47,7 +47,9 @@ router.post('/login', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     User.getUserByUsername(username, (err, user) => {
-        if (err) throw err;
+        if (err) {
+            return console.log(err);
+        }
         if (!user) {
             res.json({
                 success: false,
@@ -55,8 +57,9 @@ router.post('/login', (req, res) => {
             });
         }
         User.comparePassword(password, user.password, (err, isMatch) => {
-            if (err) throw err;
-            if (isMatch) {
+            if (err) {
+                return console.log("toto ");
+            } else if (isMatch) {
                 const token = jwt.sign({
                     type: "user",
                     data: {
@@ -66,7 +69,7 @@ router.post('/login', (req, res) => {
                         email: user.email,
                         contact: user.contact
                     }
-                }, config.secret, {
+                }, process.env.DB_PASS, {
                     expiresIn: 604800 // for 1 week time in milleseconds
                 });
                 return res.json({
