@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
-const answerSchema = new mongoose.Schema({
-
-});
-
 const questionSchema = new mongoose.Schema({
     question: {
             type: String,
@@ -28,3 +24,4 @@ const questionSchema = new mongoose.Schema({
 questionSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('Question', questionSchema, 'questions');
 
+// /^([a-zA-Z0-9\.-_]+)@([a-zA-Z0-9-]+).([a-z]{2,8})(.[a-z]{2,8})?$/
