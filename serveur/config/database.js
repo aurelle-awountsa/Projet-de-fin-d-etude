@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const host = process.env.DB_HOST;
-const dbURL = `mongodb://${host}/tfe`;
+const dbURL = `mongodb://${host}/web_app`;
 
 //connect with the database
 mongoose.connect(dbURL,
