@@ -11,28 +11,87 @@ const question_get_all = (req, res) => {
             //console.log(docs[0].question);
             //console.log(docs[0].answers[0].option);
             //docs[0].answers.forEach(x => console.log(x));
-            if(docs.length === 0) {
-                res
+            if (docs.length === 0)
+                return res
                     .status(204)
-                    .json(response);
-            }
-            docs.forEach(x => {
-                response.push(x);
-            });
-            //docs.forEach(x => console.log(x.answers));
-            res
-                .status(302)
-                .json(response);
+                    .json({message: "No documents found in the database"});
+
+            docs.forEach(x => response.push(x));
+            res.status(200).json(response);
         })
         .catch(err => {
             res
                 .status(500)
                 .json({
-                error: err
-            });
+                    errorMessage: err.message,
+                    errorName: err.name
+                });
         });
 };
 
+const question_get_one = (req, res) => {
+    const {questionId} = req.params;
+    Question.findById(questionId)
+        .select("question answers _id")
+        .exec()
+        .then(doc => {
+            //console.log("From database", doc);
+            if (doc) {
+                res
+                    .status(200)
+                    .json(new Array({
+                        question: doc.question,
+                        answers: doc.answers,
+                        request: {
+                            type: "GET",
+                            url: `http://localhost:5000/api/questions/${doc._id}`
+                        }
+                    }));
+            } else {
+                res
+                    .status(404)
+                    .json({message: "No valid entry found for provided ID"});
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res
+                .status(500)
+                .json({
+                    errorMessage: err.message,
+                    errorName: err.name
+                });
+        });
+};
+
+const question_update_one = (req, res) => {
+    const {questionId} = req.params;
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
+    Question.updateOne({_id: questionId}, {$set: updateOps})
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: "Question updated",
+                modifiedDocs: result.nModified,
+                request: {
+                    type: "GET",
+                    url: `http://localhost:5000/api/questions/${questionId}`
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res
+                .status(500)
+                .json({
+                    errorMessage: err.message,
+                    errorName: err.name
+                });
+        });
+};
 
 const questionCreate = (req, res) => {
     const question = new Question({
@@ -66,17 +125,17 @@ const questionCreate = (req, res) => {
             //console.log(result.answers.filter(x=> x.isCorrect === "true")[0].option);
             res
                 .status(201)
-                .json({
-                message: "Created question successfully",
-                createdQuestion: {
-                    name: result.question,
-                    answer : result.answers.filter(x=> x.isCorrect === "true")[0].option,
-                    request: {
-                        type: "GET",
-                        url: "http://localhost:5000/api/questions/" + result._id
+                .json(new Array({
+                    message: "Created question successfully",
+                    createdQuestion: {
+                        name: result.question,
+                        answer: result.answers.filter(x => x.isCorrect === "true")[0].option,
+                        request: {
+                            type: "GET",
+                            url: `http://localhost:5000/api/questions/${result._id}`
+                        }
                     }
-                }
-            });
+                }));
         })
         .catch(err => {
             console.log(err);
@@ -88,7 +147,40 @@ const questionCreate = (req, res) => {
         });
 };
 
+const question_delete_one = (req, res) => {
+    const {questionId} = req.params;
+    Question.findByIdAndRemove(questionId)
+        .exec()
+        .then(() => {
+            //console.log(result);
+            // console.log(questionId + result);
+            res.status(200).json({
+                message: "Question deleted successfully",
+                request: {
+                    type: "POST",
+                    url: "http://localhost:5000/api/questions",
+                    body: {
+                        question: "String",
+                        price: {
+                            option : "String",
+                            isCorrect : "Boolean",
+                        }
+                    }
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res
+                .status(404)
+                .json({message: "No valid entry found for provided ID"});
+        });
+};
+
 module.exports = {
     questionCreate,
-    question_get_all
+    question_get_all,
+    question_get_one,
+    question_update_one,
+    question_delete_one
 };
