@@ -1,6 +1,13 @@
 <h2 class="page-header">Register</h2>
 
 <form (submit)="onRegisterSubmit()">
+  <div class="form-group">
+    <label>Name</label>
+    <label>
+      <input type="text" class="form-control" [(ngModel)]="name" name="name">
+    </label>
+  </div>
+
 
   <div class="form-group">
     <label>Email</label>
@@ -16,5 +23,15 @@
     </label>
   </div>
 
-  <input type="submit" class="btn btn-primary" value="Submit">
+
+  <div class="form-group">
+    <label>Contact</label>
+    <label>
+      <input type="text" class="form-control" [(ngModel)]="contact" name="contact">
+    </label>
+  </div>
+
+
+
+  <input type=" submit" class="btn btn-primary" value="Submit">
 </form>
