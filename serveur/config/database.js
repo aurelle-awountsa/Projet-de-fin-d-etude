@@ -1,18 +1,16 @@
 const mongoose = require('mongoose');
 const host = process.env.DB_HOST;
-const dbURL = `mongodb://${host}/tfe`;
+const dbURL = `mongodb://${host}/web_app`;
 
 //connect with the database
 mongoose.connect(dbURL,
-    {
-        useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
-        useFindAndModify: false
-    })
+    {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
+        useFindAndModify : false})
     .then(() => {
         console.log(`Database connected successfully to ${dbURL}`);
     }).catch(err => {
-        console.log(err);
-    });
+    console.log(err);
+});
 
 // If the connection throws an error
 mongoose.connection.on('error', (err) => {
