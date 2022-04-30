@@ -7,7 +7,10 @@ const user_signup = (req, res) => {
     if (!req.body.email || !req.body.password) {
         return res
             .status(400)
-            .json({message: "All fields required"});
+            .json({
+                success: false,
+                message: "All fields required"
+            });
     }
 
     User.find({email: req.body.email})
@@ -17,6 +20,7 @@ const user_signup = (req, res) => {
                 return res
                     .status(409)
                     .json({
+                        success: false,
                         message: "Mail already exists"
                     });
             } else {
@@ -37,6 +41,7 @@ const user_signup = (req, res) => {
                                 res
                                     .status(201)
                                     .json({
+                                        success: true,
                                         message: "User created successfully",
                                         user: {
                                             userId: result._id,
@@ -48,6 +53,7 @@ const user_signup = (req, res) => {
                             .catch(err => {
                                 console.log(err.name);
                                 res.status(500).json({
+                                    success: false,
                                     error: err.message,
                                 });
                             });
@@ -73,12 +79,14 @@ const user_login = (req, res) => {
                 return res
                     .status(401)
                     .json({
+                        success: false,
                         message: "Auth failed !"
                     });
             }
             bcrypt.compare(req.body.password, user.password, (err, result) => {
                 if (err) {
                     return res.status(401).json({
+                        success: false,
                         message: "Auth failed"
                     });
                 }
@@ -93,7 +101,10 @@ const user_login = (req, res) => {
                             expiresIn: "1h"
                         }
                     );
-                    return res.status(200).json({
+                    return res
+                        .status(200)
+                        .json({
+                        success: true,
                         message: "Auth successful",
                         token: "JWT " + token,
                         user: {
@@ -103,13 +114,17 @@ const user_login = (req, res) => {
                     });
                 }
                 res.status(401).json({
+                    success: false,
                     message: "Auth failed"
                 });
             });
         })
         .catch(err => {
             console.log(err);
-            res.status(500).json({
+            res
+                .status(500)
+                .json({
+                success: false,
                 error: err
             });
         });
@@ -140,17 +155,17 @@ const getUserById = (req, res) => {
             if (doc) {
                 res
                     .status(200)
-                    .json(new Array({
+                    .json({
                         user: {
                             userId: doc._id,
                             email: doc.email,
-                            password : doc.password
+                            password: doc.password
                         },
                         request: {
                             type: "GET",
                             url: `http://localhost:5000/api/users/${doc._id}`
                         }
-                    }));
+                    });
             } else {
                 res
                     .status(404)
