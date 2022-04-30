@@ -18,7 +18,7 @@
     </ul>
   </div>
   <div class="mx-auto order-0">
-    <a class="navbar-brand mx-auto" href="#">Teacher App</a>
+    <a class="navbar-brand mx-auto" [routerLink]="['/home']">Teacher App</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target=".dual-collapse2">
       <span class="navbar-toggler-icon"></span>
@@ -29,6 +29,10 @@
       <li *ngIf="authService.loggedIn()" class="nav-item" [routerLinkActive]="['active']"
           [routerLinkActiveOptions]="{ exact: true }">
         <a class="nav-link" [routerLink]="['/dashboard']">Dashboard</a>
+      </li>
+      <li *ngIf="authService.loggedIn()" class="nav-item" [routerLinkActive]="['active']"
+          [routerLinkActiveOptions]="{ exact: true }">
+        <a class="nav-link" [routerLink]="['/questions']">QCM</a>
       </li>
       <li *ngIf="authService.loggedIn()" class="nav-item ">
         <a class="nav-link " style="cursor:pointer;" (click)="onSelect()">Profile</a>

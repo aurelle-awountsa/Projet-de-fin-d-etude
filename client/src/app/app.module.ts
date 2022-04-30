@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { FlashMessagesModule } from "angular2-flash-messages";
 import { JwtModule } from '@auth0/angular-jwt';
+import {ChartModule} from "angular2-chartjs";
 
 
 import { AppComponent } from './app.component';
@@ -17,6 +18,9 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import {ValidateService} from './services/validate.service';
 import { AuthService } from "./services/auth.service";
+import { QuestionsService } from "./services/questions.service";
+import { ChartsComponent } from './components/charts/charts.component';
+import { QuestionsComponent } from './components/questions/questions.component';
 
 const appRoutes : Routes = [
   {path: '', redirectTo : '/home', pathMatch: 'full'},
@@ -24,6 +28,7 @@ const appRoutes : Routes = [
   { path: "register", component: RegisterComponent },
   { path: "login", component: LoginComponent },
   { path: "dashboard", component: DashboardComponent},
+  { path: "questions", component: QuestionsComponent},
   { path: "profile/:id", component: ProfileComponent},
   { path: "**", component: HomeComponent }
 ];
@@ -40,6 +45,8 @@ enableProdMode();
     HomeComponent,
     DashboardComponent,
     ProfileComponent,
+    ChartsComponent,
+    QuestionsComponent,
 
   ],
 
@@ -49,10 +56,12 @@ enableProdMode();
     HttpClientModule,
     RouterModule.forRoot(appRoutes),
     FlashMessagesModule.forRoot(),
+    ChartModule
   ],
   providers: [
     ValidateService,
-    AuthService
+    AuthService,
+    QuestionsService
   ],
   bootstrap: [AppComponent]
 })
