@@ -9,16 +9,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aurelle-awountsa/sprachlehrer"
+    "url": "https://github.com/danny00747/mean-stack-web-app.git"
   },
   "keywords": [
     "backend",
     "server"
   ],
-  "author": "Aurelle Awountsa",
+  "author": "Daniel Olivier",
+  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "consola": "^2.11.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
