@@ -21,6 +21,9 @@ import { AuthService } from "./services/auth.service";
 import { QuestionsService } from "./services/questions.service";
 import { ChartsComponent } from './components/charts/charts.component';
 import { QuestionsComponent } from './components/questions/questions.component';
+import { ResultsComponent } from './components/results/results.component';
+import { AllUsersComponent } from './components/all-users/all-users.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 const appRoutes : Routes = [
   {path: '', redirectTo : '/home', pathMatch: 'full'},
@@ -29,6 +32,8 @@ const appRoutes : Routes = [
   { path: "login", component: LoginComponent },
   { path: "dashboard", component: DashboardComponent},
   { path: "questions", component: QuestionsComponent},
+  { path: "results", component: ResultsComponent},
+  { path: "users/all", component: AllUsersComponent},
   { path: "profile/:id", component: ProfileComponent},
   { path: "**", component: HomeComponent }
 ];
@@ -47,6 +52,9 @@ enableProdMode();
     ProfileComponent,
     ChartsComponent,
     QuestionsComponent,
+    ResultsComponent,
+    AllUsersComponent,
+    FooterComponent,
 
   ],
 
