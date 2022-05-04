@@ -1,39 +1,47 @@
 <app-min-nav-bar></app-min-nav-bar>
 
-<!-- navbar values -->
+<!-- All questions text -->
 <div *ngIf="questions.qns">
   <br>
   <h3 class="mb-4 font-weight-bold" style="margin-left: 60px">
     All Questions ({{(questions.qns).length}})
 
-    <!-- Create a question button  -->
-
+    <!-- Create a question div  -->
     <div class="btn-group">
+
+      <!-- create question  -->
       <button
         class="btn btn-success"
         style="margin-left: 390px; color: white;font-weight: bold;">
-        <i class="fa fa-plus" aria-hidden="true"></i>
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
         Create a new question
       </button>
-      <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+      <!-- delete question -->
+      <button type="button" class="btn btn-success dropdown-toggle
+        dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
         <span class="sr-only">Toggle Dropdown</span>
       </button>
+
+      <!-- create types of question dropdown menu -->
       <div class="dropdown-menu" style="background-color: #28A745;">
-        <a class="dropdown-item" data-toggle="modal" data-target=".bd-example-modal-lg"
+
+        <!-- create multiple question -->
+        <a class="dropdown-item" data-toggle="modal"
+           data-target=".bd-example-modal-lg"
            href="#" style="font-weight: bold" id="multipleQuestion"
            (click)="questionTypeChoosen($event.target)">Multiple choice</a>
 
+        <!-- create boolean question -->
         <a class="dropdown-item" data-toggle="modal" data-target="#booleanModal"
            href="#" style="font-weight: bold" id="booleanQuestion"
            (click)="questionTypeChoosen($event.target)">Boolean</a>
 
+        <!-- create fill in the blanks question -->
         <a class="dropdown-item" data-toggle="modal" data-target="#fillInModal"
            href="#" style="font-weight: bold" id="fillInBlanksQuestion"
            (click)="questionTypeChoosen($event.target)">Fill in the blanks</a>
-
-        <div class="dropdown-divider" style="font-weight: bold"></div>
-        <a class="dropdown-item" href="#" style="font-weight: bold">Separated link</a>
       </div>
     </div>
 
@@ -46,41 +54,52 @@
   </h3>
   <br>
 
-  <!-- All Question Loop -->
+  <!-- All Question Loop and pagination -->
   <ng-container *ngFor="let qn of questions.qns | paginate:
-                                                    { id: 'allQuestionsPagination',
+                                                    {
+                                                    id: 'allQuestionsPagination',
                                                         itemsPerPage: 3,
                                                         currentPage: page,
                                                         totalItems: totalItems};
                                                         trackBy: trackByMethod;
                                                         index as i">
 
-    <!-- Delete icon -->
+    <!-- Delete question icon -->
     <a *ngIf="deleteButton" (click)="getQuestionId($event.target)"
        style="margin-left: 50px; float: left" data-toggle="modal"
        data-target="#deleteModel" data-whatever="@mdo">
 
       <i class="fa fa-trash fa-2x" id="{{qn['_id']}}"
          aria-hidden="true" onmousemove="this.style.cursor = 'pointer';
-                     this.style.fontSize= '6.7vh'" onmouseout="this.style.fontSize= ''"
+                     this.style.fontSize= '6.7vh'"
+         onmouseout="this.style.fontSize= ''"
          style="color: red; margin-left: 30px"></i>
     </a>
 
     <!-- Question & it's answer card -->
     <div class="card" style="background-color: #31373e; margin-left: 120px; margin-right: 120px">
-      <div class="card-content">
 
+      <!-- question number and title div -->
+      <div class="card-content">
+        <!-- question number -->
         <p class="card-title" style="color: white; margin: 20px">Question {{qn["questionNumber"]}} :
 
         </p>
         <h5>
+
+          <!-- question title -->
           <p style="color: white; margin: 20px">
             <strong>{{qn.question}}</strong>
           </p>
         </h5>
       </div>
+
+      <!-- question's answers div -->
       <div class="card" style="margin: 10px;">
+
         <p class="list-group list-group-flush">
+
+          <!-- loop through all answers to the question -->
           <ng-container *ngFor="let option of qn['answers'];let j = index">
             <a class="list-group-item list-group-item-action">
               {{option.option}}
@@ -95,6 +114,8 @@
     </div>
     <br>
   </ng-container>
+
+  <!-- all questions pagination controls -->
   <div class="pagination justify-content-center pagination-lg">
     <pagination-controls id="allQuestionsPagination"
                          (pageChange)="page = ($event)"
@@ -113,53 +134,22 @@
      aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+
+      <!-- Multiple choice question modal header -->
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Create a new question</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">
+          Create a new question
+        </h5>
+
+        <!-- Multiple choice question close modal button -->
         <button (click)="closeAlert()" type="button" class="close"
                 data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
+      <!-- Mutliple create question body -->
       <div class="modal-body" style="margin-left: 40px">
-
-        {{registrationForm.value | json}}
-        <br>
-
-        <!-- Multiple choice question modal -->
-        <form [formGroup]="registrationForm" (ngSubmit)="submitTest()">
-
-          <div class="form-group">
-            <button type="button" class="btn btn-secondary btn-sm m-2"
-                    (click)="addAlternateEmail()">Add inputs</button>
-            <div formArrayName="alternateEmails"
-                 class="form-group custom-control custom-checkbox"
-                 *ngFor="let email of alternateEmails.controls; let i=index">
-
-              <input type="checkbox" class="custom-control-input"
-                     (click)="buttonChecked($event.target)" id="{{i}}">
-
-              <label class="custom-control-label" for="{{i}}" style="float: left">
-              </label>
-
-              <button (click)="removeSkill(i)" class="close mx-auto"
-                      style="float: right">
-                <span aria-hidden="true">&times;</span>
-              </button>
-
-              <label>
-                <textarea class="form-control " rows="2" style="width: 400px"
-                [formControlName]="i" ></textarea>
-              </label>
-
-            </div>
-          </div>
-          <br>
-          <button class="btn btn-primary"
-                  type="submit"
-                  [disabled]="!submitTestCheck()">Register
-          </button>
-        </form>
-        <br>
 
         <!-- Question -->
         <label class="font-italic" for="questionText">Add your question here</label>
@@ -170,90 +160,78 @@
                   [(ngModel)]="question" name="question"
                   style="" required></textarea>
         <small class="text-danger" [class.d-none]="textArea0.valid ||
-          textArea0.untouched">A question is required</small>
+          textArea0.untouched">
+          <i style="color: red" class="fa fa-exclamation-circle"
+             aria-hidden="true"></i> A question is required</small>
         <hr>
 
-        <section class="section-preview">
+        <!-- Add inputs button -->
+        <button style="float: left" type="button" data-toggle="tooltip"
+                class="btn btn-outline-success btn-sm m-2 rounded text-center"
+                data-placement="right" title="Add inputs"
+                (click)="addAlternateOptions()">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </button>
 
-          <!-- Answer 1 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 1
-          </small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="option1">
-            <label class="custom-control-label" for="option1"
-                   style="float: left">
-            </label>
-            <textarea #textArea1="ngModel"
-                      [class.is-invalid]="textArea1.invalid&& textArea1.touched"
-                      [class.is-valid]="!(textArea1.invalid && textArea1.untouched)"
-                      class="form-control" id="answer1" rows="2"
-                      [(ngModel)]="option1" name="option1"
-                      style="width: 440px" required></textarea>
-
-            <label for="answer1">
-            </label>
-            <small class="text-danger" [class.d-none]="textArea1.valid ||
-            textArea1.untouched">1st answer required</small>
+        <!-- Multiple question inputs body -->
+        <div class="card" style="width: 30rem;">
+          <div class="card-header">
+            Answers
           </div>
 
-          <!-- Answer 2 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 2</small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="option2">
-            <label class="custom-control-label" for="option2"
-                   style="float: left"></label>
+          <!-- Multiple inputs form group -->
+          <form [formGroup]="multipleQuestionForm">
 
-            <textarea #textArea2="ngModel"
-                      [class.is-invalid]="textArea2.invalid && textArea2.touched"
-                      [class.is-valid]="!(textArea2.invalid && textArea2.untouched)"
-                      class="form-control" id="answer2" rows="2"
-                      [(ngModel)]="option2" name="option2"
-                      style="width: 440px" required></textarea>
-            <label for="answer2"></label>
-            <small class="text-danger" [class.d-none]="textArea2.valid ||
-            textArea2.untouched">2nd answer required</small>
-          </div>
+            <div formArrayName="options"
+                 class="form-group list-group list-group-flush">
 
-          <!-- Answer 3 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 3</small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="option3">
-            <label class="custom-control-label" for="option3"
-                   style="float: left"></label>
+              <!-- Loop through dynamic inputs -->
+              <div *ngFor="let group of getAnswerOptions.controls; let i=index"
+                   [formGroupName]="i" class="list-group-item">
 
-            <textarea #textArea3="ngModel"
-                      [class.is-invalid]="textArea3.invalid && textArea3.touched"
-                      [class.is-valid]="!(textArea3.invalid && textArea3.untouched)"
-                      class="form-control" id="answer3" rows="2"
-                      [(ngModel)]="option3" name="option3"
-                      style="width: 440px" required></textarea>
-            <label for="answer3"></label>
-            <small class="text-danger" [class.d-none]="textArea3.valid ||
-            textArea3.untouched">3rd answer required</small>
-          </div>
+                <small class="font-italic" style="margin-left: 25px">
+                  Answer {{i + 1}}
+                </small>
 
-          <!-- Answer 4 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 4</small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="option4">
-            <label class="custom-control-label" for="option4"
-                   style="float: left"></label>
+                <!-- Delete input button -->
+                <button (click)="removeSkill(i)" class="close mx-auto"
+                        data-toggle="tooltip" data-placement="right"
+                        title="Delete this input">
+                  <span style="color: red" aria-hidden="true">&times;</span>
+                </button>
 
-            <textarea #textArea4="ngModel"
-                      [class.is-invalid]="textArea4.invalid && textArea4.touched"
-                      [class.is-valid]="!(textArea4.invalid && textArea4.untouched)"
-                      class="form-control" id="answer4" rows="2"
-                      [(ngModel)]="option4" name="option4"
-                      style="width: 440px" required></textarea>
-            <label for="answer4"></label>
-            <small class="text-danger" [class.d-none]="textArea4.valid ||
-            textArea4.untouched">4th answer required</small>
-          </div>
-        </section>
+                <!-- Multiple question answer input & checkbox -->
+                <div class="custom-control custom-checkbox">
+
+                  <input type="checkbox" class="custom-control-input "
+                         (click)="buttonChecked($event.target)" id="{{i}}">
+
+                  <label style="float: left" class="custom-control-label"
+                         for="{{i}}">
+                  </label>
+
+                  <!-- Multiple input textArea -->
+                  <label>
+                  <textarea class="form-control" rows="2" formControlName="option"
+                            style="width: 400px"
+                            [class.is-invalid]="group['controls'].option.invalid &&
+                      group['controls'].option.touched"
+                            [class.is-valid]="!(group['controls'].option.invalid &&
+                          group['controls'].option['untouched'])">
+                  </textarea>
+                  </label>
+                  <small class="text-danger" style="float: left"
+                         [class.d-none]="group['controls'].option.valid ||
+                     group['controls'].option['untouched']">
+                    <i style="color: red" class="fa fa-exclamation-circle"
+                       aria-hidden="true"></i>
+                    An answer required for option number : {{i + 1}}</small>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <br>
 
         <!-- multiple question info tag -->
         <small class="font-italic">
@@ -263,19 +241,21 @@
 
         <!-- multiple question footer modal -->
         <div class="modal-footer">
-          <span style="color: green; margin-right: 280px">
+          <span *ngIf="alertMessage.length > 1 && !(alertMessage.includes('wrong'))"
+                style="color: green; margin-right: 300px">
+            {{alertMessage}}
+          </span>
+          <span *ngIf="alertMessage.includes('wrong')"
+                style="color: red; margin-right: 350px">
             {{alertMessage}}
           </span>
           <button (click)="closeAlert()" type="button" class="btn btn-secondary"
                   data-dismiss="modal">Close
           </button>
-          <button appAddClass (click)="onCreateQuestion($event.target)" type="button"
-                  class="btn btn-primary" id="sumbitMultiple"
-                  [disabled]="textArea4.invalid ||
-                            textArea3.invalid ||
-                            textArea2.invalid ||
-                            textArea1.invalid ||
-                            textArea0.invalid || !submitOneAnswerCheck()">Submit
+          <button appAddClass (click)="onCreateQuestion($event.target)"
+                  type="button" class="btn btn-primary" id="sumbitMultiple"
+                  [disabled]="getAnswerOptions.invalid ||
+                  textArea0.invalid || !submitOneAnswerCheck()">Submit
           </button>
         </div>
       </div>
@@ -299,8 +279,9 @@
         <h5 class="modal-title" style="text-align: center">
           <strong>Are you sure?</strong></h5>
         <br>
-        <p>You are about to delete this question, this process is <strong>irreversible
-        </strong></p>
+        <p>You are about to delete this question, this process is
+          <strong>irreversible</strong>
+        </p>
         <p>Do you want to proceed ?</p>
       </div>
       <div class="modal-footer">
@@ -331,15 +312,19 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Create a new question</h5>
-        <button (click)="closeAlert()" type="button" class="close" data-dismiss="modal"
-                aria-label="Close">
+        <button (click)="closeAlert()" type="button" class="close"
+                data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
+      <!-- Boolean create question body -->
       <div class="modal-body" style="margin-left: 40px">
 
         <!-- Question -->
-        <label class="font-italic" for="questionText1">Add your question here</label>
+        <label class="font-italic" for="questionText1">
+          Add your question here
+        </label>
         <textarea #textAreaB0="ngModel"
                   [class.is-invalid]="textAreaB0.invalid && textAreaB0.touched"
                   [class.is-valid]="!(textAreaB0.invalid && textAreaB0.untouched)"
@@ -347,52 +332,76 @@
                   [(ngModel)]="question" name="question"
                   style="width: 500px" required></textarea>
         <small class="text-danger" [class.d-none]="textAreaB0.valid ||
-          textAreaB0.untouched">A question is required</small>
+          textAreaB0.untouched">
+          <i style="color: red" class="fa fa-exclamation-circle"
+             aria-hidden="true"></i> A question is required</small>
         <hr>
 
-        <section class="section-preview">
+        <!-- Boolean answer body -->
+        <div class="card" style="width: 30rem;">
+
+          <!-- Boolean answer header -->
+          <div class="card-header">
+            Answers
+          </div>
+
           <!-- Answer 1 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 1
-          </small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="optionB1">
-            <label class="custom-control-label" for="optionB1"
-                   style="float: left">
-            </label>
-            <textarea #textAreaB1="ngModel"
-                      [class.is-invalid]="textAreaB1.invalid&& textAreaB1.touched"
-                      [class.is-valid]="!(textAreaB1.invalid && textAreaB1.untouched)"
-                      class="form-control" id="answerB1" rows="2"
-                      [(ngModel)]="option1" name="answerB1"
-                      style="width: 440px" required></textarea>
+          <div class="list-group list-group-flush">
+            <div class="list-group-item">
+              <small class="font-italic "
+                     style="margin-left: 25px">True
+              </small>
+              <div class="custom-control custom-checkbox ">
+                <input (click)="buttonChecked($event.target)" type="checkbox"
+                       class="custom-control-input" id="optionB1">
+                <label class="custom-control-label" for="optionB1"
+                       style="float: left">
+                </label>
+                <textarea #textAreaB1="ngModel"
+                          [class.is-invalid]="textAreaB1.invalid &&
+                          textAreaB1.touched"
+                          [class.is-valid]="!(textAreaB1.invalid &&
+                          textAreaB1.untouched)"
+                          class="form-control" id="answerB1" rows="2"
+                          [(ngModel)]="option1" name="answerB1"
+                          style="width: 400px" required></textarea>
 
-            <label for="answerB1">
-            </label>
-            <small class="text-danger" [class.d-none]="textAreaB1.valid ||
-            textAreaB1.untouched">1st answer required</small>
+                <label for="answerB1">
+                </label>
+                <small class="text-danger" [class.d-none]="textAreaB1.valid ||
+              textAreaB1.untouched">
+                  <i style="color: red" class="fa fa-exclamation-circle"
+                     aria-hidden="true"></i> 1st answer required</small>
+              </div>
+            </div>
+
+            <!-- Answer 2 -->
+            <div class="list-group-item">
+              <small class="font-italic "
+                     style="margin-left: 25px">False</small>
+              <div class="custom-control custom-checkbox ">
+                <input (click)="buttonChecked($event.target)" type="checkbox"
+                       class="custom-control-input" id="optionB2">
+                <label class="custom-control-label" for="optionB2"
+                       style="float: left"></label>
+
+                <textarea #textAreaB2="ngModel"
+                          [class.is-invalid]="textAreaB2.invalid && textAreaB2.touched"
+                          [class.is-valid]="!(textAreaB2.invalid && textAreaB2.untouched)"
+                          class="form-control" id="answerB2" rows="2"
+                          [(ngModel)]="option2" name="answerB2"
+                          style="width: 400px" required></textarea>
+
+                <label for="answerB2"></label>
+                <small class="text-danger" [class.d-none]="textAreaB2.valid ||
+              textAreaB2.untouched">
+                  <i style="color: red" class="fa fa-exclamation-circle"
+                     aria-hidden="true"></i> 2nd answer required</small>
+              </div>
+            </div>
           </div>
-
-          <!-- Answer 2 -->
-          <small class="font-italic" style="margin-left: 25px">Answer 2</small>
-          <div class="custom-control custom-checkbox">
-            <input (click)="buttonChecked($event.target)" type="checkbox"
-                   class="custom-control-input" id="optionB2">
-            <label class="custom-control-label" for="optionB2"
-                   style="float: left"></label>
-
-            <textarea #textAreaB2="ngModel"
-                      [class.is-invalid]="textAreaB2.invalid && textAreaB2.touched"
-                      [class.is-valid]="!(textAreaB2.invalid && textAreaB2.untouched)"
-                      class="form-control" id="answerB2" rows="2"
-                      [(ngModel)]="option2" name="answerB2"
-                      style="width: 440px" required></textarea>
-
-            <label for="answerB2"></label>
-            <small class="text-danger" [class.d-none]="textAreaB2.valid ||
-            textAreaB2.untouched">2nd answer required</small>
-          </div>
-        </section>
+        </div>
+        <br>
 
         <!-- boolean question info tag -->
         <small class="font-italic">
@@ -449,7 +458,9 @@
                   [(ngModel)]="question" name="question"
                   style="width: 500px" required></textarea>
         <small class="text-danger" [class.d-none]="textAreaFillIn.valid ||
-          textAreaFillIn.untouched">A question is required</small>
+          textAreaFillIn.untouched">
+          <i style="color: red" class="fa fa-exclamation-circle"
+             aria-hidden="true"></i> A question is required</small>
         <hr>
 
         <div class="container" style="background-color: lightgray">
@@ -458,13 +469,16 @@
           </small>
         </div>
 
+        <!-- Question format example -->
         <small class="font-italic">
-          <i class="fa fa-exclamation-circle" aria-hidden="true" style="color: red"></i>
+          <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: red"></i>
           Enter each blank input box as a letter enclosed in square brackets,
           such as: <br>
           <strong>{{fillInexample}}</strong>
         </small>
         <br> <br>
+
+        <!-- Preview of the question typed -->
         <div class="card w-75">
           <div class="card-header ">
             <p class="font-weight-bold">
@@ -477,6 +491,7 @@
             </p>
           </div>
         </div>
+
         <br>
 
         <!-- Fill in question info tag -->
@@ -508,8 +523,5 @@
   </div>
 </div>
 
-<!-- boolean modal footer
-{{question | slice:1:question.length - 1}}
--->
 
 
