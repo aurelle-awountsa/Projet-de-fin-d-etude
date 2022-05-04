@@ -15,7 +15,7 @@
             </label>
             <input #pseudoInput="ngModel" [class.is-invalid]="pseudoInput.invalid &&
                     pseudoInput.touched"
-                   class="form-control" type="text" id="pseudo"
+                   class="form-control " type="text" id="pseudo"
                    [(ngModel)]="pseudo" name="pseudo"
                    placeholder="Email address or Username" required>
             <small class="text-danger" [class.d-none]="pseudoInput.valid ||
