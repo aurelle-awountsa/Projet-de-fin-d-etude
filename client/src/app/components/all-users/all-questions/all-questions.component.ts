@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {FlashMessagesService} from "angular2-flash-messages";
 import {AuthService} from "../../../services/auth.service";
+import {FormBuilder, FormGroup, FormArray, Validators} from '@angular/forms';
 import {Router} from "@angular/router";
 import {QuestionsService} from "../../../services/questions.service";
+import {ReplacePipe} from "../../../pipes/replace.pipe";
 
 @Component({
   selector: 'app-all-questions',
@@ -12,14 +14,12 @@ import {QuestionsService} from "../../../services/questions.service";
 export class AllQuestionsComponent implements OnInit {
 
   questionType: any;
-  question: any;
+  question: string = "";
+  questionPiped: string = "";
   option1: any;
   option2: any;
   option3: any;
   option4: any;
-
-  optionB1: any;
-  optionB2: any;
 
   alertMessage: string = "";
   deleteButton: boolean = false;
@@ -29,6 +29,11 @@ export class AllQuestionsComponent implements OnInit {
 
   totalItems: number;
   page: number = 1;
+
+  regexAnswer: any;
+
+  fillInexample: string = "Neil Armstrong {be}[was] born in 1930 and " +
+    "{go}[went] to the moon in 1969. He {die}[died] in 2012. ";
 
 
   multipleAnswer: Object = {
@@ -42,23 +47,49 @@ export class AllQuestionsComponent implements OnInit {
     "optionB1": false,
     "optionB2": false,
   };
+  registrationForm: FormGroup;
+
+  t: Array<any> = [];
 
   constructor(
     private _flashMessagesService: FlashMessagesService,
     private authService: AuthService,
     private router: Router,
-    private questions: QuestionsService
+    private questions: QuestionsService,
+    private replacePipe: ReplacePipe,
+    private formBuilder: FormBuilder
   ) {
   }
 
   ngOnInit() {
+
+    this.registrationForm = this.formBuilder.group({
+      alternateEmails: this.formBuilder.array([])
+    });
+
     this.showAllQuestion();
   }
 
   showAllQuestion() {
+
     this.questions.getQuestions()
       .toPromise()
       .then((data: any) => {
+
+        data.filter(x => x.type === 'fill in')
+          .forEach(x => {
+            x.question = this.replacePipe.transform(x.question);
+          });
+
+        data.filter(x => x.type === 'fill in')
+          .forEach(x =>
+            x.answers.forEach((x, i) =>
+              x.option = '(' + ++i + ') ' + x.option));
+
+        data.forEach((x, i) => {
+          x.questionNumber = ++i;
+        });
+
         this.questions.qns = data;
         this.totalItems = this.questions.qns.length;
       })
@@ -67,20 +98,50 @@ export class AllQuestionsComponent implements OnInit {
       });
   }
 
+  get alternateEmails() {
+    return this.registrationForm.get('alternateEmails') as FormArray;
+  }
+
+  addAlternateEmail() {
+    this.alternateEmails.push(this.formBuilder.control(''));
+    // this.t =new Array(this.registrationForm.value.alternateEmails.length);
+  }
+
+  removeSkill(index: number) {
+    this.alternateEmails.removeAt(index);
+    this.t.splice(index, 1);
+  }
+
+
   checkArray(event: any, tab: Object) {
+    // console.log(event.id);
+    //console.log(event.checked);
     (event.checked) ? tab[event.id] = true : tab[event.id] = false;
   }
 
   private buttonChecked(event) {
     this.checkArray(event, this.multipleAnswer);
     this.checkArray(event, this.booleanAnswer);
+    this.checkArray(event, this.t);
   }
+
+  submitTest() {
+
+    this.t.forEach(x => console.log(x));
+
+    console.log(this.t);
+  }
+
+  submitTestCheck(): boolean {
+    return this.t.filter(x => x).length === 1;
+  }
+
 
   questionTypeChoosen(event) {
     this.questionType = event.id;
   }
 
-  submitOneAnswerCheck() {
+  submitOneAnswerCheck(): boolean {
     return (this.questionType === 'multipleQuestion') ?
       Object.keys(this.multipleAnswer)
         .filter(x => this.multipleAnswer[x]).length === 1 :
@@ -90,6 +151,8 @@ export class AllQuestionsComponent implements OnInit {
   }
 
   onCreateQuestion(event) {
+
+    this.questionPiped = this.replacePipe.transform(this.question);
 
     let questionCreated: Object;
 
@@ -117,6 +180,7 @@ export class AllQuestionsComponent implements OnInit {
           }
         ]
       };
+
     } else if (event.id === 'sumbitBoolean') {
       questionCreated = {
 
@@ -124,16 +188,28 @@ export class AllQuestionsComponent implements OnInit {
         "question": this.question,
         "answers": [
           {
-            "option": this.optionB1,
+            "option": this.option1,
             "isCorrect": this.booleanAnswer["optionB1"]
           },
           {
-            "option": this.optionB2,
+            "option": this.option2,
             "isCorrect": this.booleanAnswer["optionB2"]
           },
         ]
       };
+    } else if (event.id === 'sumbitFillIn') {
+      questionCreated = {
+        "type": "fill in",
+        "question": this.question,
+        "answers": []
+      };
+
+      let questionAnswer = this.questions.getAnswer(this.question);
+      questionAnswer.forEach(x =>
+        questionCreated["answers"].push({"option": x, "isCorrect": true}));
     }
+
+    console.log(questionCreated);
 
     this.questions.createQuestion(questionCreated)
       .toPromise()
@@ -179,4 +255,36 @@ export class AllQuestionsComponent implements OnInit {
     Object.keys(this.multipleAnswer).forEach(x => this.multipleAnswer[x] = false);
     Object.keys(this.booleanAnswer).forEach(x => this.booleanAnswer[x] = false);
   }
+
+
 }
+
+
+/*
+var string = "(1)[toto] went to the moon ______  in (2)[1969]";
+string.match(/_{2,}/g);
+
+var string = "(1)[toto] went to the moon ______  in (2)[1969]";
+string.match(/\(\d+\)/g);
+string.match(/\[.+?\]/g);
+
+space = /_{2,}/g
+"(1)[toto] went to the moon ______  in (2)[1969]".match(space)
+
+
+t = string.match(/\(\d+\)/g);
+tt = string.match(/\[.+?\]/g);
+"(1)[toto] went to the moon in (2)[1969] and was born in (3)[usa]"
+.replace(t[0] + tt[0], '(1) ___');
+
+
+tab = {
+        "type" : "boolean",
+        "question" : "is 25 x 20 equal to 150 ?",
+        "answerss": []
+
+}
+
+
+
+ */

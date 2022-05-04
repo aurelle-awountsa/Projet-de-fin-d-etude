@@ -10,7 +10,7 @@ import {NgxPaginationModule} from 'ngx-pagination';
 
 
 import { AppComponent } from './app.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { NavbarComponent } from './components/navbar/navbar.component';
 import {enableProdMode} from '@angular/core';
@@ -36,6 +36,7 @@ import { UsersTableComponent } from './components/all-users/users-table/users-ta
 import { ValidInputDirective } from './directives/valid-input.directive';
 import {AgGridModule} from "ag-grid-angular";
 import { FilterPipe } from './pipes/filter.pipe';
+import { ReplacePipe } from './pipes/replace.pipe';
 
 const appRoutes : Routes = [
   {path: '', redirectTo : '/home', pathMatch: 'full'},
@@ -78,6 +79,7 @@ enableProdMode();
     UsersTableComponent,
     ValidInputDirective,
     FilterPipe,
+    ReplacePipe,
   ],
 
     imports: [
@@ -90,13 +92,15 @@ enableProdMode();
         FlashMessagesModule.forRoot(),
         ChartModule,
         AgGridModule.withComponents([]),
+        ReactiveFormsModule,
     ],
   providers: [
     ValidateService,
     AuthService,
     QuestionsService,
     ReviewsService,
-    JwtHelperService
+    JwtHelperService,
+    ReplacePipe
   ],
   bootstrap: [AppComponent]
 })

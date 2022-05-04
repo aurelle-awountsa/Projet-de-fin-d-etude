@@ -4,7 +4,7 @@ const {success, info, error, debug} = require('consola');
 const question_get_all = (req, res) => {
     let response = [];
     Question.find()
-        .select("question answers _id")
+        .select("question answers _id type")
         .exec()
         .then(docs => {
             //docs.forEach(x => console.log(x.question));
@@ -103,13 +103,6 @@ const question_update_one = (req, res) => {
 
 const questionCreate = (req, res) => {
 
-    if (!req.body.hasOwnProperty("answers") || Object.keys(req.body).length > 4)
-        return res
-            .status(400)
-            .json({
-                message: "Please read the API doc to see how to create a question"
-            });
-    console.log(req.body);
     const question = new Question(req.body);
     question
         .save()
