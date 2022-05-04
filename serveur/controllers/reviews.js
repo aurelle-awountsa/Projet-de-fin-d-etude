@@ -85,14 +85,14 @@ const reviewsCreate = (req, res) => {
 
 const reviewsUpdateOne = (req, res) => {
 
-    const {userId, reviewId} = req.params;
-    if (!userId || !reviewId) {
+    const {userEmail, reviewId} = req.params;
+    if (!userEmail || !reviewId) {
         return res
             .status(404)
             .json({message: 'The question id and review id are both required'});
     }
 
-    User.findById(userId)
+    User.findOne({email: userEmail})
         .select('reviews')
         .exec()
         .then(user => {
@@ -106,7 +106,7 @@ const reviewsUpdateOne = (req, res) => {
                 if (!user.reviews.id(reviewId)) {
                     return res
                         .status(404)
-                        .json({message: 'No was review found with provided ID'});
+                        .json({message: 'No was review found with provided Email'});
                 } else {
 
                     if (Object.keys(req.body).length > 2) {
@@ -128,7 +128,7 @@ const reviewsUpdateOne = (req, res) => {
                                     .json({message: "No review was found"});
                             res
                                 .status(200)
-                                .json({message: "Review updated successfully"});
+                                .json({message: "Review updated successfully !"});
                         })
                         .catch(err => {
                             res.status(500).json({
@@ -156,21 +156,21 @@ const reviewsUpdateOne = (req, res) => {
 
 const reviewsDeleteOne = (req, res) => {
 
-    const {userId, reviewId} = req.params;
-    if (!userId || !reviewId) {
+    const {userEmail, reviewId} = req.params;
+    if (!userEmail || !reviewId) {
         return res
             .status(404)
-            .json({message: 'The question id and review id are both required'});
+            .json({message: 'User email and review id are both required'});
     }
 
-    User.findById(userId)
+    User.findOne({email: userEmail})
         .select('reviews')
         .exec()
         .then(user => {
             if (!user) // !user is nul here and if it's not null we got a user
                 return res
                     .status(404)
-                    .json({message: 'No user was found with provided ID'});
+                    .json({message: 'No user was found with provided Email'});
 
             if (user.reviews && user.reviews.length > 0) {
                 if (!user.reviews.id(reviewId)) {
@@ -180,7 +180,6 @@ const reviewsDeleteOne = (req, res) => {
                 } else {
                     user.reviews.id(reviewId).remove();
                     user.save(err => {
-                        ;
                         if (err) { // err is null here
                             return res
                                 .status(500)

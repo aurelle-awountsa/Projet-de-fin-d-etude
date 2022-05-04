@@ -49,13 +49,22 @@ export class AuthService {
     }
   }
 
-  updateUser(user: any) {
+  updateUser(userId: any, user: any) {
     this.getToken();
     if (this.authToken) {
       const httpAuthHeaders = new HttpHeaders()
         .set('Authorization', this.authToken);
-      return this._http.patch(`/server/api/user/${JSON.parse(this.user).userId}`,
+      return this._http.patch(`/server/api/user/${userId}`,
         user, {headers: httpAuthHeaders});
+    }
+  }
+
+  deleteUser(userId: any){
+    this.getToken();
+    if (this.authToken) {
+      const httpAuthHeaders = new HttpHeaders()
+        .set('Authorization', this.authToken);
+      return this._http.delete(`/server/api/user/${userId}`, {headers: httpAuthHeaders});
     }
   }
 
@@ -93,6 +102,7 @@ export class AuthService {
     this.user = null;
     localStorage.removeItem('id_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     //localStorage.clear();
   }
 
