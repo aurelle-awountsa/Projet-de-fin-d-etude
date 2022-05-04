@@ -57,15 +57,12 @@ export class QuestionsComponent implements OnInit {
     this.question.qns[this.question.qnProgress].answer = choice;
     this.question.qns[this.question.qnProgress].index = index;
 
-     //console.log(qID, choice);
-     //console.log(typeof JSON.parse(this.question.qns[this.question.qnProgress].answer));
-
      if (JSON.parse(this.question.qns[this.question.qnProgress].answer)) {
        this.question.correctAnswerCount++;
-       console.log(this.question.correctAnswerCount);
      }
 
-    if (JSON.parse(choice.toLowerCase())) {
+    /**
+     * if (JSON.parse(choice.toLowerCase())) {
       this._flashMessagesService.show("correct answer", {
         cssClass: "alert-success w-25 text-center",
         timeout: 2000
@@ -76,9 +73,12 @@ export class QuestionsComponent implements OnInit {
         timeout: 2000,
       });
     }
-    await new Promise(r => setTimeout(r, 2000));
+     await new Promise(r => setTimeout(r, 2000));
+     */
+
     this.question.qnProgress++;
     if (this.question.qnProgress == (this.question.qns).length) {
+      this.question.timeTaken = this.question.displayTimeElapsed();
       clearInterval(this.question.timer);
       await this.router.navigate(['/results']);
     }

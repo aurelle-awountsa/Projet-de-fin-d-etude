@@ -11,6 +11,8 @@ import {QuestionsService} from "../../../services/questions.service";
 })
 export class ResultsComponent implements OnInit {
 
+  private description : any;
+
   constructor(
     private _flashMessagesService: FlashMessagesService,
     private authService: AuthService,
@@ -32,6 +34,18 @@ export class ResultsComponent implements OnInit {
     this.authService.updateScore(userScore)
       .toPromise()
       .then()
+      .catch(err => {
+        console.log(err);
+      });
+    this.getLevel();
+  }
+
+  getLevel(){
+    this.authService.getProfile()
+      .toPromise()
+      .then((data: any) => {
+        this.description = this.questions.getLevelDescription(data.user.level);
+      })
       .catch(err => {
         console.log(err);
       });

@@ -291,10 +291,11 @@ const update_user_score = (req, res) => {
 const get_user_by_id = (req, res) => {
     const {userId} = req.params;
     User.findById(userId)
-        .select("_id email role username password")
+        .select("_id email role username level password")
         .exec()
         .then(doc => {
             if (doc) {
+                console.log(doc);
                 res
                     .status(200)
                     .json({
@@ -303,6 +304,7 @@ const get_user_by_id = (req, res) => {
                             email: doc.email,
                             username: doc.username,
                             role: doc.role,
+                            level: doc.level,
                             password: doc.password
                         },
                         request: {
@@ -328,15 +330,15 @@ const get_user_by_id = (req, res) => {
 
 
 function getLevel(user, score) {
-    if (score <= 0 && score < 2) {
+    if (score <= 0 || score < 2) {
         return this.user = "A1"
-    } else if (score <= 2 && score < 4) {
+    } else if (score <= 2 || score < 4) {
         return this.user = "A2"
-    } else if (score <= 4 && score < 6) {
+    } else if (score <= 4 || score < 6) {
         return this.user = "B1"
-    } else if (score <= 6 && score < 8) {
+    } else if (score <= 6 || score < 8) {
         return this.user = "B2"
-    } else if (score <= 8 && score < 9) {
+    } else if (score <= 8 || score <= 9) {
         return this.user = "C1"
     } else {
         return this.user = "C2"
