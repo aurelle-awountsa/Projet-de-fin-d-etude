@@ -19,9 +19,11 @@ export class AllUsersComponent implements OnInit {
 
   ngOnInit() {
 
-    if (!this.authService.getAllProfiles()) {
+    if (!this.authService.getAllProfiles() || (this.authService.role !== 'admin' &&
+      this.authService.role !== 'teacher')) {
+      this.authService.logout();
       return this._flashMessagesService.show("", {
-        navigate: `${this.router.navigate(['/login'])}`
+        navigate: `${this.router.navigate(['/home'])}`
       });
     }
 

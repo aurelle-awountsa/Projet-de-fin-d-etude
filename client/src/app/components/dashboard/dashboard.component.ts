@@ -18,7 +18,8 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.authService.getProfile() === undefined) {
+    if (!Object.keys(localStorage).includes('id_token')) {
+      this.authService.logout();
       return this._flashMessagesService.show("", {
         navigate: `${this.router.navigate(['/login'])}`
       });

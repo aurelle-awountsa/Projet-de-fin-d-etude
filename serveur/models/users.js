@@ -12,7 +12,7 @@ const reviewSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
-        max: 5
+        max: 10
     },
     reviewText: {
         type: String,
@@ -34,6 +34,21 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         require: true
+    },
+    score: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 10
+    },
+    level: {
+        type: String,
+        enum: ["A2", "B1", "B2", "C1", "C2"]
+    },
+    role: {
+        type: String,
+        default: 'student',
+        enum: ["student", "teacher", "admin"]
     },
     reviews: [reviewSchema]
 });

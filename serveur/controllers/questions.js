@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Question = require("../models/questions");
 const {success, info, error, debug} = require('consola');
 
@@ -67,24 +66,32 @@ const question_get_one = (req, res) => {
 
 const question_update_one = (req, res) => {
     const {questionId} = req.params;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops["propName"]] = ops.value;
-    }
-    Question.updateOne({_id: questionId}, {$set: updateOps})
+    if (Object.keys(req.body).length !== 2 || Object.keys(req.body.answers).length !== 4)
+        return res
+            .status(400)
+            .json({
+                message: "Please read the API doc to see how to update a question"
+            });
+
+    Question.updateOne({_id: questionId}, {$set: req.body})
         .exec()
         .then(result => {
-            res.status(200).json({
-                message: "Question updated",
-                modifiedDocs: result.nModified,
-                request: {
-                    type: "GET",
-                    url: `http://localhost:5000/api/questions/${questionId}`
-                }
-            });
+            if (result.n === 0) {
+                return res
+                    .status(404)
+                    .json({message: "No valid entry found for provided ID"});
+            } else {
+                res.status(200).json({
+                    message: "Question updated",
+                    modifiedDocs: result.nModified,
+                    request: {
+                        type: "GET",
+                        url: `http://localhost:5000/api/questions/${questionId}`
+                    }
+                });
+            }
         })
         .catch(err => {
-            //console.log(err);
             res
                 .status(500)
                 .json({
@@ -95,54 +102,45 @@ const question_update_one = (req, res) => {
 };
 
 const questionCreate = (req, res) => {
-    const question = new Question({
-        question: req.body.question,
-        answers: [
-            {
-                option: req.body.answers[0].option,
-                isCorrect: req.body.answers[0].isCorrect
-            },
-            {
-                option: req.body.answers[1].option,
-                isCorrect: req.body.answers[1].isCorrect
-            },
-            {
-                option: req.body.answers[2].option,
-                isCorrect: req.body.answers[2].isCorrect
-            },
-            {
-                option: req.body.answers[3].option,
-                isCorrect: req.body.answers[3].isCorrect
-            },
 
-        ]
-    });
-    //console.log((req.body.question).question);
-    //req.body.answers.forEach(x => console.log(x.option));
-    //console.log(req.body.isCorrect);
+    if (!req.body.hasOwnProperty("answers") || Object.keys(req.body).length !== 2 ||
+        Object.keys(req.body.answers).length !== 4)
+        return res
+            .status(400)
+            .json({
+                message: "Please read the API doc to see how to update a question"
+            });
+
+    const question = new Question(req.body);
     question
         .save()
         .then(result => {
-            //console.log(result.answers.filter(x=> x.isCorrect === "true")[0].option);
-            res
-                .status(201)
-                .json(new Array({
-                    message: "Created question successfully",
-                    createdQuestion: {
-                        name: result.question,
-                        answer: result.answers.filter(x => x.isCorrect === "true")[0].option,
-                        request: {
-                            type: "GET",
-                            url: `http://localhost:5000/api/questions/${result._id}`
+            if (!result) {
+                res.status(405).json({
+                    message: "Invalid input"
+                });
+            } else {
+                res
+                    .status(201)
+                    .json(new Array({
+                        message: "Created question successfully",
+                        createdQuestion: {
+                            name: result.question,
+                            answer: result.answers.filter(x => x.isCorrect === "true")[0].option,
+                            request: {
+                                type: "GET",
+                                url: `http://localhost:5000/api/questions/${result._id}`
+                            }
                         }
-                    }
-                }));
+                    }));
+            }
         })
         .catch(err => {
             //console.log(err);
             res
-                .status(500)
+                .status(405)
                 .json({
+                    message: "Invalid input",
                     error: err
                 });
         });
@@ -174,7 +172,7 @@ const question_delete_one = (req, res) => {
         })
         .catch(err => {
             //console.log(err);
-            error({message: `An error occured while to delete this question : ${err}`, badge : true});
+            error({message: `An error occured while to delete this question : ${err}`, badge: true});
             res
                 .status(404)
                 .json({message: "An error occured while trying to delete this question"});

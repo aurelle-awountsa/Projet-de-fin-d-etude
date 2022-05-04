@@ -5,24 +5,22 @@ import {JwtHelperService} from '@auth0/angular-jwt';
 const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
 
 
-
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   authToken: any;
   user: any;
-  currentUser : any;
+  role: any;
 
   constructor(private _http: HttpClient) {
   }
 
-  registerUser(user : any) {
+  registerUser(user: any) {
     return this._http.post('/server/api/signup', user, {headers});
   }
 
-  loginUser(user : any) {
+  loginUser(user: any) {
     return this._http.post('/server/api/login', user, {headers});
   }
 
@@ -33,13 +31,26 @@ export class AuthService {
     if (this.authToken) {
       const httpAuthHeaders = new HttpHeaders()
         .set('Authorization', this.authToken);
-      return this._http.get(`/server/api/user/profile/${JSON.parse(this.user).userId}`,
+      return this._http.get(`/server/api/user/${JSON.parse(this.user).userId}`,
         {headers: httpAuthHeaders});
     }
   }
 
+
+  updateScore(user: any) {
+    this.getToken();
+    if (this.authToken) {
+      const httpAuthHeaders = new HttpHeaders()
+        .set('Authorization', this.authToken);
+      return this._http.patch(`/server/api/user/${JSON.parse(this.user).userId}/score`,
+        user, {headers: httpAuthHeaders});
+    }
+  }
+
+
   getAllProfiles() {
     this.getToken();
+    //console.log(this.authToken);
     if (this.authToken) {
       const httpAuthHeaders = new HttpHeaders()
         .set('Authorization', this.authToken);
@@ -48,12 +59,14 @@ export class AuthService {
     }
   }
 
-  storeUserData(data : any) {
+  storeUserData(data: any) {
     localStorage.setItem("id_token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("role", data.user.role);
+    localStorage.setItem("score", data.user.score);
     this.authToken = data.token;
     this.user = data.user;
-    this.currentUser = data.user.userId;
+    this.role = data.user.role;
   }
 
   getToken() {
@@ -73,7 +86,7 @@ export class AuthService {
 
   loggedIn() {
     //let keys = Object.keys(localStorage);
-   // console.log(this.user);
+    // console.log(this.user);
     return !!this.authToken;
   }
 }

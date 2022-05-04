@@ -5,6 +5,7 @@ import { FlashMessagesModule } from "angular2-flash-messages";
 import { JwtModule } from '@auth0/angular-jwt';
 import {ChartModule} from "angular2-chartjs";
 import {JwtHelperService} from '@auth0/angular-jwt';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 import { AppComponent } from './app.component';
@@ -27,6 +28,7 @@ import { ResultsComponent } from './components/results/results.component';
 import { AllUsersComponent } from './components/all-users/all-users.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { ReviewsComponent } from './components/reviews/reviews.component';
+import { AddClassDirective } from './directives/add-class.directive';
 
 const appRoutes : Routes = [
   {path: '', redirectTo : '/home', pathMatch: 'full'},
@@ -45,6 +47,7 @@ const appRoutes : Routes = [
 enableProdMode();
 
 
+// noinspection AngularInvalidImportedOrDeclaredSymbol
 @NgModule({
   declarations: [
     AppComponent,
@@ -60,15 +63,17 @@ enableProdMode();
     AllUsersComponent,
     FooterComponent,
     ReviewsComponent,
+    AddClassDirective,
   ],
 
   imports: [
     BrowserModule,
+    NgbModule,
     FormsModule,
     HttpClientModule,
     RouterModule.forRoot(appRoutes),
     FlashMessagesModule.forRoot(),
-    ChartModule
+    ChartModule,
   ],
   providers: [
     ValidateService,

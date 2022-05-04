@@ -10,6 +10,8 @@ import {ValidateService} from "../../services/validate.service";
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  token : any;
+  userId : any;
 
   constructor(private validateService: ValidateService,
               private _flashMessagesService: FlashMessagesService,
@@ -25,7 +27,7 @@ export class NavbarComponent implements OnInit {
         (profile: any) => {
           //const {user} = profile;
           //console.log(profile.user.userId);
-          this.router.navigate(['/profile', profile.user.userId]);
+          `${this.router.navigate(['/profile', profile.user.userId])}`
           //console.log(profile);
           // console.log(user.userId);
           // console.log(user.email);
@@ -40,7 +42,7 @@ export class NavbarComponent implements OnInit {
 
   onLogOutClick() {
 
-    if(!localStorage.getItem('id_token')) {
+    if(!Object.keys(localStorage).includes('id_token')) {
       this.authService.logout();
       this._flashMessagesService.show("Please log in first", {
         cssClass: "alert-danger w-25",

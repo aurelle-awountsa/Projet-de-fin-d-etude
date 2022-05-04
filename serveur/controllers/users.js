@@ -32,12 +32,13 @@ const user_signup = (req, res) => {
                     } else {
                         const user = new User({
                             email: req.body.email,
-                            password: hash
+                            password: hash,
+                            role: req.body.role || "student"
                         });
                         user
                             .save()
                             .then(result => {
-                               // console.log(result);
+                                // console.log(result);
                                 res
                                     .status(201)
                                     .json({
@@ -46,12 +47,12 @@ const user_signup = (req, res) => {
                                         user: {
                                             userId: result._id,
                                             userEmail: result.email,
+                                            role: result.role,
                                             userPassword: result.password
                                         }
                                     });
                             })
                             .catch(err => {
-                              //  console.log(err.name);
                                 res.status(500).json({
                                     success: false,
                                     error: err.message,
@@ -60,7 +61,12 @@ const user_signup = (req, res) => {
                     }
                 });
             }
+        }).catch(err => {
+        res.status(500).json({
+            success: false,
+            error: err.message,
         });
+    });
 };
 
 const user_login = (req, res) => {
@@ -74,7 +80,6 @@ const user_login = (req, res) => {
     User.findOne({email: req.body.email})
         .exec()
         .then(user => {
-            //console.log(user);
             if (!user) {
                 return res
                     .status(401)
@@ -104,14 +109,16 @@ const user_login = (req, res) => {
                     return res
                         .status(200)
                         .json({
-                        success: true,
-                        message: "Auth successful",
-                        token: "JWT " + token,
-                        user: {
-                            userId: user._id,
-                            userEmail: user.email
-                        }
-                    });
+                            success: true,
+                            message: "Auth successful",
+                            token: "JWT " + token,
+                            user: {
+                                userId: user._id,
+                                userEmail: user.email,
+                                role: user.role,
+                                score: user.score
+                            }
+                        });
                 }
                 res.status(401).json({
                     success: false,
@@ -120,13 +127,12 @@ const user_login = (req, res) => {
             });
         })
         .catch(err => {
-            //console.log(err);
             res
                 .status(500)
                 .json({
-                success: false,
-                error: err
-            });
+                    success: false,
+                    error: err
+                });
         });
 };
 
@@ -139,7 +145,6 @@ const user_delete = (req, res) => {
                     .status(404)
                     .json({message: "No user found for the provided ID"});
             }
-            //console.log(result);
             res.status(200).json({
                 message: "User deleted successfully"
             });
@@ -172,10 +177,105 @@ const users_get_all = (req, res) => {
         });
 };
 
-const getUserById = (req, res) => {
+const update_user = (req, res) => {
+    const {userId} = req.params;
+    const userInfo = ["email", "password", "level", "role", "reviews"];
+    const reqBodyLength = Object.keys(req.body).length;
+    const checkValues = Object.keys(req.body).filter(x => (userInfo.includes(x))).length;
+
+    if ((Object.keys(req.body).length > 6) || (reqBodyLength !== checkValues)) {
+        return res
+            .status(405)
+            .json({
+                message: "Some fields are NOT allowed"
+            });
+    }
+
+    if (userId === process.env.ADMIN_ID && req.user.role !== 'admin') {
+        return res
+            .status(403)
+            .json({
+                message: "Can NOT update admin's info !!!"
+            });
+    }
+
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err)
+            return res.status(400).json({
+                message: "password field is required"
+            });
+        req.body.password = hash;
+        User.updateOne({_id: userId}, {$set: req.body})
+            .exec()
+            .then(result => {
+                if (result.n === 0) {
+                    return res
+                        .status(404)
+                        .json({message: "No valid entry found for provided ID"});
+                } else {
+                    res.status(200).json({
+                        message: "User info updated successfully",
+                        modifiedDocs: result.nModified,
+                        request: {
+                            type: "GET",
+                            url: `http://localhost:5000/api/user/${userId}`
+                        }
+                    });
+                }
+            }).catch(err => {
+            res
+                .status(500)
+                .json({
+                    errorMessage: err.message,
+                    errorName: err.name
+                });
+        });
+    });
+};
+
+const update_user_score = (req, res) => {
+    const {userId} = req.params;
+
+    if ((Number(req.body.score) > 10) ) {
+        return res
+            .status(405)
+            .json({
+                message: "The max score is 10"
+            });
+    }
+
+    const userScore = { "score" : req.body.score};
+    User.updateOne({_id: userId}, {$set: userScore})
+        .exec()
+        .then(result => {
+            if (result.n === 0) {
+                return res
+                    .status(404)
+                    .json({message: "No valid entry found for provided ID"});
+            } else {
+                res.status(200).json({
+                    message: "User info updated successfully",
+                    modifiedDocs: result.nModified,
+                    request: {
+                        type: "GET",
+                        url: `http://localhost:5000/api/user/${userId}`
+                    }
+                });
+            }
+        }).catch(err => {
+        res
+            .status(500)
+            .json({
+                errorMessage: err.message,
+                errorName: err.name
+            });
+    });
+};
+
+const get_user_by_id = (req, res) => {
     const {userId} = req.params;
     User.findById(userId)
-        .select("_id email password")
+        .select("_id email role password")
         .exec()
         .then(doc => {
             if (doc) {
@@ -185,11 +285,12 @@ const getUserById = (req, res) => {
                         user: {
                             userId: doc._id,
                             email: doc.email,
+                            role: doc.role,
                             password: doc.password
                         },
                         request: {
                             type: "GET",
-                            url: `http://localhost:5000/api/user/profile/${doc._id}`
+                            url: `http://localhost:5000/api/user/${doc._id}`
                         }
                     });
             } else {
@@ -199,7 +300,6 @@ const getUserById = (req, res) => {
             }
         })
         .catch(err => {
-           // console.log(err);
             res
                 .status(500)
                 .json({
@@ -209,10 +309,9 @@ const getUserById = (req, res) => {
         });
 };
 
+
+
 module.exports = {
-    user_signup,
-    user_delete,
-    user_login,
-    users_get_all,
-    getUserById
+    user_signup, user_delete, user_login,
+    users_get_all, get_user_by_id, update_user, update_user_score
 };

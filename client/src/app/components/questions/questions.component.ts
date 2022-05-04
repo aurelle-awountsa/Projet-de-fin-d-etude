@@ -25,7 +25,7 @@ export class QuestionsComponent implements OnInit {
     this.showQuestion();
     this.startTimer();
 
-    if (this.authService.getProfile() === undefined) {
+    if (!Object.keys(localStorage).includes('id_token')) {
       return this._flashMessagesService.show("", {
         navigate: `${this.router.navigate(['/login'])}`
       });
@@ -55,9 +55,14 @@ export class QuestionsComponent implements OnInit {
   async answer(index, choice) {
     this.question.qns[this.question.qnProgress].answer = choice;
     this.question.qns[this.question.qnProgress].index = index;
+
      //console.log(qID, choice);
-     console.log(this.question.qns[this.question.qnProgress].answer);
-     console.log(this.question.qns[this.question.qnProgress].index);
+     //console.log(typeof JSON.parse(this.question.qns[this.question.qnProgress].answer));
+
+     if (JSON.parse(this.question.qns[this.question.qnProgress].answer)) {
+       this.question.correctAnswerCount++;
+     }
+
     if (JSON.parse(choice.toLowerCase())) {
       this._flashMessagesService.show("correct answer", {
         cssClass: "alert-success w-25 text-center",

@@ -40,9 +40,13 @@ const questions = require('./routes/questions');
 app.use('/api', users);
 app.use('/api', questions);
 app.use('/api', reviews);
+app.use('/api/docs', (req, res) => {
+    res.sendFile(path.join(__dirname + '../../docs/index.html'));
+});
+
 
 app.listen(process.env.PORT, () => {
-    info({message :`Server started on port ${process.env.PORT}`, badge : true})
+    info({message: `Server started on port ${process.env.PORT}`, badge: true})
 });
 
 // catch 404 and forward to error handler
@@ -57,7 +61,7 @@ app.use((error, req, res) => {
     //console.log(res.locals.error);
     res.status(error.status || 500);
     res.json({
-        message : error.message
+        message: error.message
     });
 });
 
