@@ -10,13 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/danny00747/mean-stack-web-app.git"
+    "url": "https://github.com/aurelle-awountsa/Sprachlehrer"
   },
   "keywords": [
     "backend",
     "server"
   ],
-  "author": "Daniel Olivier",
+  "author": "aurelle awountsa",
   "license": "MIT",
   "dependencies": {
     "accesscontrol": "^2.2.1",

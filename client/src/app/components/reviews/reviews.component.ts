@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FlashMessagesService} from "angular2-flash-messages";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
@@ -11,9 +11,13 @@ import {ReviewsService} from "../../services/reviews.service";
 })
 export class ReviewsComponent implements OnInit {
 
+  title: string;
   currentRate: number;
   reviewText: string;
   readonly: boolean = true;
+  deleteId: any;
+  loggedInUser: any;
+  updateId: any;
 
   constructor(
     private _flashMessagesService: FlashMessagesService,
@@ -25,6 +29,7 @@ export class ReviewsComponent implements OnInit {
 
   ngOnInit() {
     this.showReviews();
+    this.loggedInUser = this.authService.userEmail;
   }
 
   showReviews() {
@@ -32,6 +37,7 @@ export class ReviewsComponent implements OnInit {
     this.reviews.getAllReviews()
       .toPromise()
       .then((data: any) => {
+        this.reviews.userId = data._id;
         data.forEach(x => x.reviews.forEach(y => tab.push(y)));
         tab
           .sort((a, b) => Date.parse(b.CreatedOn) - Date.parse(a.CreatedOn))
@@ -47,7 +53,7 @@ export class ReviewsComponent implements OnInit {
       });
   }
 
-  onReviewSubmit() {
+  onReviewCreate() {
     const review = {
       rating: this.currentRate,
       reviewText: this.reviewText
@@ -57,10 +63,12 @@ export class ReviewsComponent implements OnInit {
     this.reviews.createReview(JSON.stringify(review))
       .toPromise()
       .then(() => {
-          this.showReviews();
-          `${this.router.navigate(['/reviews'])}`;
-        }
-      )
+        this.showReviews();
+        this._flashMessagesService.show("Review added successfully !", {
+          cssClass: "alert-success w-25",
+          timeout: 2000
+        });
+      })
       .catch(err => {
         console.log(err);
         this._flashMessagesService.show("Something went wrong", {
@@ -70,6 +78,60 @@ export class ReviewsComponent implements OnInit {
         });
       });
 
+  }
+
+  modelTitle(event) {
+    this.updateId = event.id;
+    (event.name === 'createReview') ? this.title = 'Create a new review'
+      : this.title = 'Update this review';
+  }
+
+  getDeleteId(event) {
+    this.deleteId = event.title;
+  }
+
+  onDeleteReview() {
+    this.reviews.deleteReview(this.authService.userId, this.deleteId)
+      .toPromise()
+      .then((data: any) => {
+        this.showReviews();
+        this._flashMessagesService.show(`${data.message}`, {
+          cssClass: "alert-success w-25",
+          timeout: 2000
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  onUpdateReview(){
+    const review = {
+      rating: this.currentRate,
+      reviewText: this.reviewText
+    };
+    this.reviews.updateReview(this.authService.userId, this.updateId,
+      JSON.stringify(review))
+      .toPromise()
+      .then(() => {
+        this.showReviews();
+        this._flashMessagesService.show("Review updated successfully !", {
+          cssClass: "alert-success w-25",
+          timeout: 2000
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  choose(){
+    if (this.title === 'Create a new review') {
+      this.onReviewCreate();
+
+    } else if (this.title === 'Update this review'){
+      this.onUpdateReview();
+    }
   }
 
 }
