@@ -7,6 +7,8 @@ const {success, info, error, debug} = require('consola');
 require('dotenv').config();
 require('./config/database');
 
+
+
 // Initialize the app
 const app = express();
 
@@ -15,7 +17,7 @@ app.use(cors());
 
 // set the static folder
 if (process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.join(__dirname, 'public/dist')));
+    app.use(express.static(path.join(__dirname, './server-side/public/dist')));
 }
 
 
@@ -27,7 +29,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // bring the passport auth strategy
-require('./config/passport')(passport);
+//require('config/passport')(passport);
+require('./config/passport');
 
 app.get('/', (req, res) => {
     return res.json({
@@ -36,9 +39,9 @@ app.get('/', (req, res) => {
 });
 
 // Bring in the user routers
-const reviews = require('./routes/reviews');
-const users = require('./routes/users');
-const questions = require('./routes/questions');
+const reviews = require('./server-side/routes/reviews');
+const users = require('./server-side/routes/users');
+const questions = require('./server-side/routes/questions');
 
 app.use('/server/api/', users);
 app.use('/server/api/', questions);
@@ -48,7 +51,7 @@ app.use('/server/api/docs', (req, res) => {
 });
 
 app.get('*', (req, res) =>{
-    res.sendFile(path.join(__dirname + '/public/dist/index.html'));
+    res.sendFile(path.join(__dirname + './server-side/public/dist/index.html'));
 });
 
 app.listen(process.env.PORT, () => {
