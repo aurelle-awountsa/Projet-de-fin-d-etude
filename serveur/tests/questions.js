@@ -190,7 +190,7 @@ describe('Questions', () => {
                 });
         });
 
-        it('it should not DELETE a question with a wrong id', (done) => {
+        it('it should not DELETE a question with a wrong id', () => {
 
             const questionId = '7eab24dee08248016851dd3';
 
@@ -200,48 +200,8 @@ describe('Questions', () => {
                     res.should.have.status(404);
                     res.body.should.have.property('message')
                         .eql('An error occured while trying to delete this question');
-                    done();
                 });
         });
     });
 
 });
-
-
-
-
-
-
-
-
-
-/*
-* Test the /GET/:id route
-it('it should POST a question ', (done) => {
-    let question = {
-        "type": "boolean",
-        "question": "what's 2000 - 150 ?",
-        "answers": [
-            {
-                "option": "true",
-                "isCorrect": true
-            },
-            {
-                "option": "false",
-                "isCorrect": false
-            }
-        ]
-    };
-    chai.request(server)
-        .post('/server/api/questions')
-        .send(question)
-        .end((err, res) => {
-            console.log(res.body);
-            res.should.have.status(201);
-            res.body.should.be.a('object');
-            res.body.should.have
-                .property('createdQuestion');
-            done();
-        });
-});
-* */
