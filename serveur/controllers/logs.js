@@ -7,6 +7,7 @@ const saveLog = (level, log, type) => {
     (log.hostname === 'devwebapp.herokuapp.com') ?
         new Log({
             level: `${level}`,
+            type: `${type}`,
             message: `${type} ${log.method} request to ${log.originalUrl}`,
             url: `${log.originalUrl}`,
             host: `${log.hostname}`,
@@ -19,17 +20,16 @@ const saveLog = (level, log, type) => {
 
 const updateLog = (level, log, type, status) => {
 
-    const logs = {
-        level: `${level}`,
-        response: `${type} ${log.method} request to ${log.originalUrl}`,
-        status: `${status}`,
-    };
-
-    Log.updateOne({requestId: (log.id).toString()}, {$set: logs})
-        .exec()
-        .then()
-        .catch();
+    (log.hostname === 'devwebapp.herokuapp.com') ?
+        new Log({
+            level: `${level}`,
+            type: `${type}`,
+            response: `${type} ${log.method} request to ${log.originalUrl}`,
+            status: `${status}`,
+            requestId: `${log.id}`,
+        }).save().then().catch(err => console.log(err)) : undefined;
 };
+
 
 const getLogs = (req, res) => {
     Log.find()
