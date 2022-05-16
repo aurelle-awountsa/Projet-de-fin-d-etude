@@ -1,10 +1,12 @@
-const express = require("express");
-const passport = require("passport");
-
+import express from 'express';
 const router = express.Router();
+import passport from 'passport'
 
 const ctrlUsers = require("../controllers/users");
 const ctrlAcess = require("../controllers/grandAccess");
+
+import {postUser, loggedInUser, getUsers, getUser, patchUser, deleteUser, patchScore} from '../crtl/users'
+import makeCallback from '../express-callback'
 
 /**
  * Session is set to false because we are using JWTs, and don't need a session!
@@ -12,33 +14,20 @@ const ctrlAcess = require("../controllers/grandAccess");
  * implement a session
  */
 
-router.post("/signup", ctrlUsers.user_signup);
-router.post("/login", ctrlUsers.user_login);
-router
-    .get("/users/profiles", passport.authenticate("jwt", {session: false}),
-        ctrlAcess.grantAccess('readAny', 'profile'),
-        ctrlUsers.users_get_all);
+router.post("/signup", makeCallback(postUser));
+router.post("/login", makeCallback(loggedInUser));
+router.get("/users/profiles", makeCallback(getUsers));
 
 router
     .route("/user/:userId")
-    .get(passport.authenticate("jwt", {session: false}),
-        ctrlAcess.grantAccess('readOwn', 'profile'),
-        ctrlUsers.get_user_by_id)
+    .get(makeCallback(getUser))
+    .patch(makeCallback(patchUser))
+    .delete(makeCallback(deleteUser));
 
-    .delete(passport.authenticate("jwt", {session: false}),
-        ctrlAcess.grantAccess('deleteOwn', 'profile'),
-        ctrlUsers.user_delete)
-
-    .patch(passport.authenticate("jwt", {session: false}),
-        ctrlAcess.grantAccess('updateOwn', 'profile'),
-        ctrlUsers.update_user);
-
-router.patch("/user/:userId/score",
-    passport.authenticate("jwt", {session: false}),
-    ctrlAcess.grantAccess('updateOwn', 'profile'),
-    ctrlUsers.update_user_score);
+router.patch("/user/:userId/score", makeCallback(patchScore));
 
 
-module.exports = router;
+export {router as usersRoutes};
+
 
 

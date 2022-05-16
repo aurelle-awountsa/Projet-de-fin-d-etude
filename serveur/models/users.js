@@ -17,7 +17,10 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    CreatedOn: {
+    created: {
+        type: String
+    },
+    updated: {
         type: String
     }
 });
@@ -60,4 +63,4 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Userz', userSchema);

@@ -11,7 +11,7 @@ const getAuthor = (req, res, callback) => {
             } else {
                 res
                     .status(404)
-                    .json({message: "No valid entry found for provided ID"});
+                    .json({message: "No user found with the provided ID"});
             }
         })
         .catch(err => {
@@ -35,14 +35,18 @@ const doAddReview = (req, res, user) => {
             author: user.email,
             rating,
             reviewText,
-            CreatedOn: new Date()
+            created: new Date(),
+            updated: new Date(),
         });
         user
             .save()
             .then(review => {
                 res
                     .status(201)
-                    .json(review);
+                    .json({
+                        message: "Review created successfully !",
+                        review: review.reviews[(review.reviews).length - 1],
+                    });
             }).catch(err => {
             res
                 .status(500)
@@ -82,7 +86,6 @@ const reviewsCreate = (req, res) => {
         });
 };
 
-
 const reviewsUpdateOne = (req, res) => {
 
     const {userEmail, reviewId} = req.params;
@@ -99,14 +102,14 @@ const reviewsUpdateOne = (req, res) => {
             if (!user)
                 return res
                     .status(404)
-                    .json({message: 'No user was found with provided ID'});
+                    .json({message: 'No user was found with provided Email'});
 
             if (user.reviews && user.reviews.length > 0) {
                 const thisReview = user.reviews.id(reviewId);
                 if (!user.reviews.id(reviewId)) {
                     return res
                         .status(404)
-                        .json({message: 'No was review found with provided Email'});
+                        .json({message: 'No was review found with provided ID'});
                 } else {
 
                     if (Object.keys(req.body).length > 2) {
@@ -119,6 +122,7 @@ const reviewsUpdateOne = (req, res) => {
 
                     thisReview.rating = req.body.rating;
                     thisReview.reviewText = req.body.reviewText;
+                    thisReview.updated = new Date();
                     user
                         .save()
                         .then(result => {
@@ -128,7 +132,10 @@ const reviewsUpdateOne = (req, res) => {
                                     .json({message: "No review was found"});
                             res
                                 .status(200)
-                                .json({message: "Review updated successfully !"});
+                                .json({
+                                    message: "Review updated successfully !",
+                                    review: result.reviews[(result.reviews).length - 1]
+                                });
                         })
                         .catch(err => {
                             res.status(500).json({
