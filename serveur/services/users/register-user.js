@@ -1,17 +1,15 @@
 import {makeUser} from '../../domain'
+export default function makeAdduserService({userRepository}) {
 
-export default function makeAdduser({usersDb}) {
-    return async function addUser(userInfo) {
+    return async (userInfo) => {
 
-        const user = makeUser(userInfo);
+        const user = makeUser({...userInfo});
 
-        const existing = await usersDb.findByEmailOrUsername(userInfo.email, userInfo.username);
+        const existing = await userRepository.findByEmailOrUsername({...userInfo});
 
-        if (existing.length !== 0) {
-            return {message: "A user with the same username or email already exists !"}
-        }
+        if (existing.length !== 0) return {message: "A user with the same username or email already exists !"};
 
-        return usersDb.save({
+        return userRepository.save({
             username: user.getUsername(),
             email: user.getEmail(),
             password: user.getPassword(),

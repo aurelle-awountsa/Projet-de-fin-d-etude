@@ -1,5 +1,5 @@
-export default function makeListUsers({ usersDb }) {
-    return async function listUsers() {
-        return usersDb.findAll();
+export default function makeListUsersService({userRepository}) {
+    return async () => {
+        return userRepository.findAll();
     }
 }
