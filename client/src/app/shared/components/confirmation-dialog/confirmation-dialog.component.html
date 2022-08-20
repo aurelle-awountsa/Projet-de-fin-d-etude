@@ -1,0 +1,11 @@
+<div class="confirmation-content">
+  {{message}}
+</div>
+
+<hr>
+
+<div style="float: right">
+  <button pButton [label]="'NO'" class="p-button-secondary p-button-outlined p-mr-2" (click)="close(false)"></button>
+  <button pButton icon="pi pi-check" [label]="'CONFIRM'" (click)="close(true)"></button>
+</div>
+
