@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "../../../core/services/auth.service";
-import {FlashMessagesService} from "angular2-flash-messages";
+import {AuthService} from "@app/core/services/auth.service";
 import {Router} from "@angular/router";
+import {EToastSeverities, ToastService} from "@app/core/services/toast.service";
 
 @Component({
   selector: 'app-all-users',
@@ -10,37 +10,38 @@ import {Router} from "@angular/router";
 })
 export class AllUsersComponent implements OnInit {
 
-  users: any[];
-  email: string;
-  username: string;
-  usernames: string;
-  password: string;
+  users = [];
+  email = '';
+  username= '';
+  usernames= '';
+  password= '';
 
-  confirmPassword: string;
-  userId: string;
+  confirmPassword= '';
+  userId= '';
   alertMessage: string = "";
 
   searchValue: string = "";
 
   constructor(private authService: AuthService,
-              private _flashMessagesService: FlashMessagesService,
+              public toastService: ToastService,
               private router: Router
   ) {
   }
 
   ngOnInit() {
 
+    const t  = localStorage['my.token'];
+
+
     if (!this.authService.getAllProfiles() ||
-      (JSON.parse(localStorage.getItem('user')).role !== 'admin' &&
-        JSON.parse(localStorage.getItem('user')).role !== 'teacher')) {
+      (JSON.parse(localStorage['user']).role !== 'admin' &&
+        JSON.parse(localStorage['user']).role !== 'teacher')) {
       this.authService.logout();
-      return this._flashMessagesService.show("", {
-        navigate: `${this.router.navigate(['/login'])}`
-      });
+      this.toastService.show(EToastSeverities.INFO, 'Redirected to login page !');
+      this.router.navigate(['/login']);
     }
 
-    this.authService.getAllProfiles()
-      .toPromise()
+    this.authService.getAllProfiles()?.toPromise()
       .then((data: any) => {
         this.users = data;
       })
@@ -49,12 +50,14 @@ export class AllUsersComponent implements OnInit {
       });
   }
 
-  getUpdateId(event) {
+  getUpdateId(event: any) {
     this.userId = event.name;
-    this.usernames =  this.users.find(x => x._id === event.name).username;
+    if (this.users){
+      this.usernames =  this.users.find(x => x._id === event.name).username;
+    }
   }
 
-  getDeleteId(event) {
+  getDeleteId(event: any) {
     this.userId = event.id;
   }
 
@@ -65,8 +68,7 @@ export class AllUsersComponent implements OnInit {
       "password": this.password
     };
 
-    this.authService.updateUser(this.userId, user)
-      .toPromise()
+    this.authService.updateUser(this.userId, user)?.toPromise()
       .then((data: any) => {
         this.ngOnInit();
         this.alertMessage = `${data.message}`;

@@ -1,32 +1,22 @@
 import buildMakeQuestion from './question'
 import buildMakeReview from './reviews'
 import buildMakeUser from './user'
+import buildMakeBooking from './booking'
 import buildMakeLog from './logs'
-import EmailValidator from 'email-validator';
 import requiredParam from '../helpers/required-parameter'
-import bcrypt from 'bcrypt'
+import isValidEmail from '../helpers/validate-email'
+import {passwordFactory} from '../security'
 
-const makeQuestion = buildMakeQuestion(requiredParameter);
-const makeReview = buildMakeReview(requiredParameter);
-const makeUser = buildMakeUser(isValidEmail, hashPassword, requiredParameter);
-const makeLog = buildMakeLog(requiredParameter);
-
-function hashPassword(password) {
-    return bcrypt.hashSync(password, 10);
-}
-
-function isValidEmail(email) {
-    return EmailValidator.validate(email);
-}
+const makeQuestion = buildMakeQuestion(requiredParam);
+const makeReview = buildMakeReview(requiredParam);
+const makeBooking = buildMakeBooking(requiredParam);
+const makeUser = buildMakeUser(isValidEmail, passwordFactory.hashPassword, requiredParam);
+const makeLog = buildMakeLog(requiredParam);
 
 const entities = Object.freeze({
-    makeQuestion, makeUser
+    makeQuestion, makeUser, makeBooking
 });
 
-function requiredParameter(param) {
-    return requiredParam(param)
-}
-
 export default entities
-export {makeQuestion, makeUser, makeReview, makeLog}
+export {makeQuestion, makeUser, makeReview, makeBooking, makeLog}
 

@@ -1,5 +1,5 @@
 const makeCallback = (controller) => {
-    return (req, res) => {
+    return async (req, res) => {
         const httpRequest = {
             body: req.body,
             query: req.query,
@@ -8,6 +8,7 @@ const makeCallback = (controller) => {
             id: req.id,
             host : req.hostname,
             url : req.originalUrl,
+            user: req.user,
             method: req.method,
             path: req.path,
             headers: {
@@ -16,17 +17,20 @@ const makeCallback = (controller) => {
                 'User-Agent': req.get('User-Agent')
             }
         };
-        controller(httpRequest)
-            .then(httpResponse => {
-                res.type('json');
-                res.status(httpResponse.statusCode).json(httpResponse.body)
-            })
-            .catch(err => res.status(500).send(
-                {
-                    message: 'An unknown error occurred.',
-                    error: err
-                }))
+
+        try {
+            const httpResponse = await controller(httpRequest)
+
+            res
+                .type('json')
+                .status(httpResponse.statusCode)
+                .json(httpResponse.body)
+        } catch (error) {
+            res
+                .status(500)
+                .send({ message: 'An unknown error occurred.', error: error })
+        }
     }
-};
+}
 
 export default makeCallback

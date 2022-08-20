@@ -1,4 +1,4 @@
-
+<br>
 <!-- Quick nagivaition title -->
 <div class="container" >
   <div class="row justify-content-center">
@@ -26,6 +26,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
+            <li class="nav-item" [routerLinkActive]="['active']"
+                [routerLinkActiveOptions]="{ exact: true }">
+              <a id="calendarBtn" [routerLink]="['/calendar']"
+                 class="nav-link text-monospace font-italic font-weight-bolder" style="cursor: pointer">
+                Calendar</a>
+            </li>
             <li class="nav-item" [routerLinkActive]="['active']"
                 [routerLinkActiveOptions]="{ exact: true }">
               <a id="usersBtn" [routerLink]="['/users/all']"

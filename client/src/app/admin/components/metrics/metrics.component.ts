@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {FlashMessagesService} from "angular2-flash-messages";
-import {AuthService} from "../../../core/services/auth.service";
+
+import {AuthService} from "@app/core/services/auth.service";
 import {Router} from "@angular/router";
-import {FilterLogsPipe} from "../../../shared/pipes/filter-logs.pipe";
+import {FilterLogsPipe} from "@app/shared/pipes/filter-logs.pipe";
+import {EToastSeverities, ToastService} from "@app/core/services/toast.service";
 
 @Component({
   selector: 'app-metrics',
@@ -16,16 +17,18 @@ export class MetricsComponent implements OnInit {
 
   logInfo: Array<any>;
   searchValue: string = "";
-  numberOflogs: number = 30;
+  logsError: string = "";
+  numberOflogs: number = 10;
 
   users: any;
   totalItems: number;
   page: number = 1;
 
-  constructor(private _flashMessagesService: FlashMessagesService,
-              private authService: AuthService,
-              private filterLogs: FilterLogsPipe,
-              private router: Router) {
+  constructor(
+    private authService: AuthService,
+    public toastService: ToastService,
+    private filterLogs: FilterLogsPipe,
+    private router: Router) {
   }
 
   ngOnInit() {
@@ -33,16 +36,15 @@ export class MetricsComponent implements OnInit {
       (JSON.parse(localStorage.getItem('user')).role !== 'admin' &&
         JSON.parse(localStorage.getItem('user')).role !== 'teacher')) {
       this.authService.logout();
-      return this._flashMessagesService.show("", {
-        navigate: `${this.router.navigate(['/login'])}`
-      });
+      this.toastService.show(EToastSeverities.INFO, 'Redirected to login page !');
+      this.router.navigate(['/login']);
     }
     this.showUsersLogs();
   }
 
   showUsersLogs() {
 
-    if(this.numberOflogs > this.totalItems){
+    if (this.numberOflogs > this.totalItems || this.numberOflogs < 10) {
       this.numberOflogs = this.totalItems;
     }
 
@@ -51,8 +53,6 @@ export class MetricsComponent implements OnInit {
         this.totalItems : this.numberOflogs)
       .toPromise()
       .then((data: Array<any>) => {
-
-        console.log(this.numberOflogs, "eeeeeeee");
 
         this.totalItems = data.shift().totalLogs;
 
@@ -63,12 +63,12 @@ export class MetricsComponent implements OnInit {
 
         this.users = [...data[0]];
       })
-      .catch(err => console.log(err));
+      .catch(err => this.logsError = err.error.error);
   }
 
   getMoreLogs() {
-      this.numberOflogs += 10;
-      this.showUsersLogs();
+    this.numberOflogs += 10;
+    this.showUsersLogs();
   }
 
 

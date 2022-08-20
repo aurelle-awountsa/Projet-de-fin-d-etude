@@ -1,60 +1,63 @@
-const mongoose = require('mongoose');
-const {success, info, error, debug} = require('consola');
-const host = process.env.DB_HOST;
-const hostCloud = process.env.MONGODB_URI;
-const dbURL = `mongodb://${host}/web_app`;
+import mongoose from 'mongoose';
+import {success, info, error, debug} from 'consola';
 
-//connect with the database NODE_ENV=test
+import env from './environment'
 
-if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev') {
-    mongoose.connect(dbURL,
-        {
-            useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
-            useFindAndModify: false
-        })
-        .then(() => {
-            success({
-                message: `Database connected successfully to ${dbURL}`,
-                badge: true
-            });
-        }).catch(err => {
-        error({message: `Mongoose connection error: ${err}`, badge: true});
-    });
-} else if (process.env.NODE_ENV === 'production') {
-    mongoose.connect(hostCloud,
-        {
-            useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
-            useFindAndModify: false
-        })
-        .then(() => {
-            success({
-                message: `Database connected successfully to ${hostCloud}`,
-                badge: true
-            });
-        }).catch(err => {
-        error({message: `Mongoose connection error: ${err}`, badge: true});
-    });
+const dbURL = `mongodb://${env["DB_HOST"]}/web_app`;
 
-    // If the connection throws an error
-    mongoose.connection.on('error', (err) => {
-        error({message: `Mongoose connection error: ${err}`, badge: true});
-    });
+export default function startDatabase() {
+
+    if (env.NODE_ENV === 'test' || env.NODE_ENV === 'dev') {
+        mongoose.connect(dbURL,
+            {
+                useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
+                useFindAndModify: false
+            })
+            .then(() => {
+                success({
+                    message: `Database connected successfully to ${dbURL}`,
+                    badge: true
+                });
+            }).catch(err => {
+            error({message: `Mongoose connection error: ${err}`, badge: true});
+        });
+    } else if (process.env.NODE_ENV === 'production') {
+        mongoose.connect(env["MONGODB_URI"],
+            {
+                useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true,
+                useFindAndModify: false
+            })
+            .then(() => {
+                success({
+                    message: `Database connected successfully to ${env["MONGODB_URI"]}`,
+                    badge: true
+                });
+            }).catch(err => {
+            error({message: `Mongoose connection error: ${err}`, badge: true});
+        });
+
+        // If the connection throws an error
+        mongoose.connection.on('error', (err) => {
+            error({message: `Mongoose connection error: ${err}`, badge: true});
+        });
 
 // When the connection is disconnected
-    mongoose.connection.on('disconnected', () => {
-        error({message: 'Mongoose  connection disconnected', badge: true});
-    });
+        mongoose.connection.on('disconnected', () => {
+            error({message: 'Mongoose  connection disconnected', badge: true});
+        });
 
 // If the Node process ends, close the Mongoose connection
-    process.on('SIGINT', () => {
-        mongoose.connection.close(() => {
-            error({
-                message: 'Mongoose connection disconnected through app termination',
-                badge: true
+        process.on('SIGINT', () => {
+            mongoose.connection.close(() => {
+                error({
+                    message: 'Mongoose connection disconnected through app termination',
+                    badge: true
+                });
+                process.exit(0);
             });
-            process.exit(0);
         });
-    });
+    }
+
 }
 
 

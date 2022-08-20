@@ -1,41 +1,48 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {JwtModule} from '@auth0/angular-jwt';
-import {JwtHelperService} from '@auth0/angular-jwt';
-import {AgGridModule} from "ag-grid-angular";
-import {enableProdMode} from '@angular/core';
-
-import {AdminModule} from './admin/admin.module';
-import {FeaturesModule} from './features/features.module';
 import {CoreModule} from './core/core.module';
 
 import {AppComponent} from './app.component';
 import {SharedModule} from "./shared/shared.module";
+import {PageNotFoundComponent} from "@app/core/components/page-not-found/page-not-found.component";
+import {TranslateLoader, TranslateModule} from "@ngx-translate/core";
+import {HttpClient} from "@angular/common/http";
+import {TranslateHttpLoader} from "@ngx-translate/http-loader";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 const appRoutes: Routes = [
-  { path: 'admin', loadChildren: () => import(`./admin/admin.module`)
-      .then(module => module.AdminModule) },
-  {path: "features", loadChildren : './features/features.module#FeaturesModule'},
-  //{path: "**", redirectTo: '/home', pathMatch: 'full'}
+  {
+    path: '',
+    loadChildren: () => import(`./admin/admin.module`).then(module => module.AdminModule)
+  },
+  {
+    path: '',
+    loadChildren: () => import(`./features/features.module`).then(module => module.FeaturesModule)
+  },
+  {path: "**", component: PageNotFoundComponent}
 ];
 
 //enableProdMode();
 
-// noinspection AngularInvalidImportedOrDeclaredSymbol
 @NgModule({
   declarations: [
     AppComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     SharedModule,
-    AdminModule,
-    AdminModule,
-    FeaturesModule,
     CoreModule,
-    RouterModule.forRoot(appRoutes),
-    AgGridModule.withComponents([]),
+    TranslateModule.forRoot({
+      defaultLanguage: 'en',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (http: HttpClient) => new TranslateHttpLoader(http, './assets/i18n/', '.json'),
+        deps: [HttpClient]
+      }
+    }),
+    RouterModule.forRoot(appRoutes)
   ],
   bootstrap: [AppComponent]
 })

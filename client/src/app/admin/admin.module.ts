@@ -11,12 +11,17 @@ import {UsersTableComponent} from "./components/users-table/users-table.componen
 import {MetricsComponent} from "./components/metrics/metrics.component";
 import {AllUsersComponent} from "./components/all-users/all-users.component";
 import { MinNavBArComponent } from './components/min-nav-bar/min-nav-bar.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
+import { ViewBookingComponent } from './components/calendar/view-booking/view-booking.component';
+import {DialogService} from "primeng/dynamicdialog";
+import {CalendarModule} from 'primeng/calendar';
 
 const appRoutes : Routes = [
   { path: "questions/all", component: AllQuestionsComponent},
   { path: "users/info", component: UsersTableComponent},
   { path: "users/metrics", component: MetricsComponent},
   { path: "users/all", component: AllUsersComponent},
+  { path: "calendar", component: CalendarComponent},
 ];
 
 @NgModule({
@@ -25,15 +30,20 @@ const appRoutes : Routes = [
     UsersTableComponent,
     MetricsComponent,
     AllUsersComponent,
-    MinNavBArComponent
+    MinNavBArComponent,
+    CalendarComponent,
+    ViewBookingComponent
   ],
   imports: [
     CommonModule,
     SharedModule,
-    RouterModule.forChild(appRoutes)
+    CalendarModule,
+    RouterModule.forChild(appRoutes),
   ],
+  exports: [RouterModule],
   providers: [
     ReplacePipe,
+    DialogService,
     FilterLogsPipe
   ],
 })

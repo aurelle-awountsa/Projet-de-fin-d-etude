@@ -3,26 +3,47 @@ const router = express.Router();
 import passport from 'passport'
 
 import makeCallback from '../helpers/express-callback'
-import userController  from '../controllers/users'
-
+import controllers  from '../controllers'
+import {userController}  from '../controllers'
+import grantAccess from "../security/grandAccess";
 
 /**
  * Session is set to false because we are using JWTs, and don't need a session!
- * * If you do not set this to false, the Passport framework will try and
- * implement a session
+ * If you do not set this to false, the passport framework will try to implement a session.
  */
 
-router.post("/signup", makeCallback(userController.postUserController));
-router.post("/login", makeCallback(userController.loggedInUserController));
-router.get("/users/profiles", makeCallback(userController.getUsersController));
+router.post("/signup", makeCallback(userController.registerUser));
+router.post("/login", makeCallback(userController.logInUser));
+router.get("/user/verify/:key", makeCallback(userController.verifyUser));
+router.get("/user/resend/:userEmail", makeCallback(userController.resendEmail));
+
+router.get("/username/:username",
+    passport.authenticate("jwt", {session: false}),
+    makeCallback(userController.getUsername));
+
+router.get("/users/profiles",
+    passport.authenticate("jwt", {session: false}),
+    grantAccess('readAny', 'profile'),
+    makeCallback(userController.getAllUsers));
 
 router
     .route("/user/:userId")
-    .get(makeCallback(userController.getUserController))
-    .patch(makeCallback(userController.patchUserController))
-    .delete(makeCallback(userController.deleteUserController));
+    .get(passport.authenticate("jwt", {session: false}),
+        grantAccess('readOwn', 'profile'),
+        makeCallback(controllers.userController.getUser))
 
-router.patch("/user/:userId/score", makeCallback(userController.patchScoreController));
+    .patch(passport.authenticate("jwt", {session: false}),
+        grantAccess('updateOwn', 'profile'),
+        makeCallback(controllers.userController.patchUser))
+
+    .delete(passport.authenticate("jwt", {session: false}),
+        grantAccess('deleteOwn', 'profile'),
+        makeCallback(controllers.userController.deleteUser));
+
+router.patch("/user/:userId/score",
+    passport.authenticate("jwt", {session: false}),
+    grantAccess('updateOwn', 'profile'),
+    makeCallback(userController.patchScore));
 
 export {router as usersRoutes};
 

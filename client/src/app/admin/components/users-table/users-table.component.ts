@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import {FlashMessagesService} from "angular2-flash-messages";
-import {AuthService} from "../../../core/services/auth.service";
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from "@app/core/services/auth.service";
 import {Router} from "@angular/router";
+import {EToastSeverities, ToastService} from "@app/core/services/toast.service";
 
 @Component({
   selector: 'app-users-table',
@@ -10,10 +10,10 @@ import {Router} from "@angular/router";
 })
 export class UsersTableComponent implements OnInit {
 
-  private colDefs;
-  private gridColumnApi;
-  searchValue : string = "";
-  private gridApi;
+  private colDefs: any;
+  private gridColumnApi: any;
+  searchValue: string = "";
+  private gridApi: any;
 
   users: any;
 
@@ -22,7 +22,7 @@ export class UsersTableComponent implements OnInit {
   sortEmail: boolean = false;
 
   constructor(
-    private _flashMessagesService: FlashMessagesService,
+    public toastService: ToastService,
     private authService: AuthService,
     private router: Router
   ) {
@@ -30,67 +30,74 @@ export class UsersTableComponent implements OnInit {
 
   ngOnInit() {
 
+    if (!this.authService.getAllProfiles() ||
+      (JSON.parse(localStorage.getItem('user')).role !== 'admin' &&
+        JSON.parse(localStorage.getItem('user')).role !== 'teacher')) {
+      this.authService.logout();
+      this.toastService.show(EToastSeverities.INFO, 'Redirected to login page !');
+      this.router.navigate(['/login']);
+    }
+
     this.colDefs = [
-      {headerName : "Usernames", field : "username", width : 150},
-      {headerName : "Email", field : "email", width : 160},
-      {headerName : "Score", field : "score", width : 120},
-      {headerName : "Level", field : "username", width : 120},
-      ];
+      {headerName: "Usernames", field: "username", width: 150},
+      {headerName: "Email", field: "email", width: 160},
+      {headerName: "Score", field: "score", width: 120},
+      {headerName: "Level", field: "username", width: 120},
+    ];
 
     this.showUsersInTable();
   }
 
   showUsersInTable() {
-    this.authService.getAllProfiles()
-      .toPromise()
+    this.authService.getAllProfiles()?.toPromise()
       .then((data: any) => {
-        this.users = data.filter(x => x.username !== 'admin' && x.username !== 'teacher');
+        this.users = data.filter((x: any) => x.username !== 'admin' && x.username !== 'teacher');
       })
       .catch(err => {
         console.log(err);
       });
   }
 
-  sortByUsername(event) {
-    if (event.id === 'username'){
+  sortByUsername(event: any) {
+    if (event.id === 'username') {
       if (this.sortUsername) {
         this.sortUsername = false;
-        this.users.sort((a, b) => (a.username < b.username) ? 1
+        this.users.sort((a: any, b: any) => (a.username < b.username) ? 1
           : (a.username > b.username) ? -1 : 0);
       } else {
         this.sortUsername = true;
-        this.users.sort((a, b) => (a.username > b.username) ? 1
+        this.users.sort((a: any, b: any) => (a.username > b.username) ? 1
           : (a.username < b.username) ? -1 : 0);
       }
-    } else if (event.id === 'score'){
+    } else if (event.id === 'score') {
       if (this.sortScore) {
         this.sortScore = false;
-        this.users.sort((a, b) => (a.score - b.score));
+        this.users.sort((a: any, b: any) => (a.score - b.score));
       } else {
         this.sortScore = true;
-        this.users.sort((a, b) => (b.score - a.score));
+        this.users.sort((a: any, b: any) => (b.score - a.score));
       }
 
-    } else if (event.id === 'email'){
+    } else if (event.id === 'email') {
       if (this.sortEmail) {
         this.sortEmail = false;
-        this.users.sort((a, b) => (a.email < b.email) ? 1
+        this.users.sort((a: any, b: any) => (a.email < b.email) ? 1
           : (a.email > b.email) ? -1 : 0);
       } else {
         this.sortEmail = true;
-        this.users.sort((a, b) => (a.email > b.email) ? 1
+        this.users.sort((a: any, b: any) => (a.email > b.email) ? 1
           : (a.email < b.email) ? -1 : 0);
       }
     }
   }
 
-  onGridReady(event){
-  this.gridApi = event.api;
-  this.gridColumnApi = event.columnApi;
-  event.api.setRowData(this.users);
+  onGridReady(event: any) {
+    this.gridApi = event.api;
+    this.gridColumnApi = event.columnApi;
+    event.api.setRowData(this.users);
   }
 
-  quickSearch(){
+  quickSearch() {
     this.gridApi.setQuickFilter(this.searchValue);
   }
 

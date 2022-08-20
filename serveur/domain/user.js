@@ -1,18 +1,20 @@
-export default function buildMakeUser(isValidEmail, hashPassword, requiredParameter) {
+export default function buildMakeUser(isValidEmail, hashedPassword, requiredParameter) {
     return ({
                 username = requiredParameter('A username'),
                 email = requiredParameter('An email'),
-                password = requiredParameter('A password'), level = 'A1', score = 0,
-                role = 'student', reviews = []
+                password = requiredParameter('A password'),
+                level = 'A1', score = 0, booking = [],
+                role = 'student', isVerified = false, createdOn = new Date(), reviews = []
             } = {}) => {
 
         if (typeof username !== 'string') throw new TypeError('A username must be a string.');
 
-        if (username.length < 4 || username.length >= 9) throw new RangeError('A username minimum length is 4 and max is 9 .');
+        if (username.length < 4 || username.length >= 12)
+            throw new RangeError('A username length must be between 4 and 12 .');
+
+        if (typeof email !== 'string') throw new SyntaxError('An email must be of type string.');
 
         if (!EmailValidation()) throw new SyntaxError('Invalid email.');
-
-        if (typeof email !== 'string') throw new TypeError('An email must be of type string.');
 
         if (typeof password !== 'string') throw new TypeError('The password must be of type string.');
 
@@ -20,34 +22,35 @@ export default function buildMakeUser(isValidEmail, hashPassword, requiredParame
 
         if (score < 0 || score > 10) throw new RangeError('The score must be between 0 and 10.');
 
-        const levelEnum = {
+        if (typeof reviews !== 'object') throw new TypeError('Reviews must be an array');
+        if (typeof booking !== 'object') throw new TypeError('Booking must be an object');
+
+        //  if (!makeHash().match(/^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$/)) throw new Error('Password not hashed !');
+
+        const levelEnum = Object.freeze({
             A1: "A1", A2: "A2", B1: "B1",
             B2: "B2", C1: "C1", C2: "C2"
-        };
-        Object.freeze(levelEnum);
+        });
 
-        const roleEnum = {ADMIN: "admin", TEACHER: "teacher", STUDENT: "student"};
-        Object.freeze(roleEnum);
+        const roleEnum = Object.freeze({ADMIN: "admin", TEACHER: "teacher", STUDENT: "student"});
 
         if (role !== roleEnum.ADMIN && role !== roleEnum.TEACHER &&
             role !== roleEnum.STUDENT) {
-            throw new Error('These are the role are allowed : ' +
-                'admin, teacher, student');
+            throw new RangeError('These are the role are allowed : admin, teacher, student');
         }
 
         return Object.freeze({
             getUsername: () => username,
             getEmail: () => email,
-            getPassword: () => makeHash(),
+            getPassword: () => hashedPassword(password),
             getReviews: () => reviews,
+            getBooking: () => booking,
             getRole: () => role,
             getScore: () => score,
+            getVerifiedStatus: () => isVerified,
+            getcreatedOn: () => createdOn,
             getLevel: () => getUserLevel(score)
         });
-
-        function makeHash() {
-            return hashPassword(password)
-        }
 
         function EmailValidation() {
             return isValidEmail(email);

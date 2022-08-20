@@ -16,6 +16,8 @@ export class AuthService {
   userEmail: any;
   username: any;
 
+  token : string = localStorage.getItem('id_token');
+
   constructor(private _http: HttpClient) {
   }
 
@@ -39,10 +41,26 @@ export class AuthService {
     }
   }
 
-  getLogs(limit : number){
-    return this._http.get(`/server/api/users/metrics/max/${limit}`, {headers});
+  getUserByUsername(username) {
+    const httpAuthHeaders = new HttpHeaders().set('Authorization', this.token);
+    return this._http.get(`/server/api/username/${username}`, {headers: httpAuthHeaders});
   }
 
+  getLogs(limit : number){
+    const httpAuthHeaders = new HttpHeaders()
+      .set('Authorization', this.authToken);
+    return this._http.get(`/server/api/users/metrics/max/${limit}`,
+      {headers: httpAuthHeaders});
+  }
+
+
+  confirmEmail(key : string){
+    return this._http.get(`/server/api/user/verify/${key}`, {headers});
+  }
+
+  resendEmail(email : string){
+    return this._http.get(`/server/api/user/resend/${email}`, {headers});
+  }
 
   updateScore(user: any) {
     this.getToken();
