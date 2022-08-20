@@ -1,0 +1,62 @@
+{
+  "NAV": {
+    "TITLE": "Teacher App",
+    "LOGIN": "Login",
+    "LOGOUT": "Logout",
+    "HOME": "HOME",
+    "REGISTER": "REGISTER",
+    "CONTACT": "CONTACT",
+    "ABOUT": "ABOUT",
+    "REVIEWS": "REVIEWS",
+    "SETTINGS": "Settings",
+    "BOOKING": "Booking",
+    "ADMIN": {
+      "TITLE": "Admin",
+      "CALENDAR": "Calendar",
+      "ALL_USERS": "All Users",
+      "ALL_QUESTIONS": "All Questions",
+      "USERS_INFO": "Users Info"
+    },
+    "TEACHER": {
+      "TITLE": "Teacher",
+      "ALL_USERS": "All Users",
+      "ALL_STUDENTS_SCORES": "Student's scores",
+      "ALL_QUESTIONS": "All Questions"
+    }
+  },
+  "HOME": {
+    "TITLE": "LEARN GERMANY ONLINE",
+    "SUBTITLE": "Welcome to our application",
+    "LOGIN": "LOGIN",
+    "REGISTER": "REGISTER",
+    "SUB1": {
+      "TITLE": "Learn To Speak Germany",
+      "TEXT": "Learn how to speak proper English with a combination of our AI powered pronunciation exercises and dialogues made by our English experts. You can also try our conversation exercises and practice speaking with Germany speakers from our online community."
+    },
+    "SUB2": {
+      "TITLE": "Teach Kids Or Adults",
+      "TEXT": "We offer both positions when you decide to teach from home with us. We offer a range lessons for two age groups of students, varying from conversational group classes to private and tailored one-to-one lessons."
+    },
+    "SUB3": {
+      "TITLE": "Germany Online",
+      "TEXT": "Teaching Germany online is a great alternative to teaching abroad. The flexibility, comfort, and freedom gives teachers from the US and UK a chance to interact with international students while working from home."
+    }
+  },
+  "REGISTER": {
+    "TITLE": "Create an Account",
+    "SUBTITLE": "It's free and anyone can join!",
+    "SIGNUP_BTN": "SIGN UP",
+    "LOGIN_URL": "Already have an account ? Login",
+    "WARN": " An unverified account is deleted within a week."
+  },
+  "LOGIN": {
+    "TITLE": "Log in to your account",
+    "SUBTITLE": "To log in, please fill in these fields with your e-mail or username and password.",
+    "SIGNIN_BTN": "SIGN IN",
+    "SIGNUP_URL": "Don't have an account ? Sign Up"
+  },
+  "REVIEW": {
+    "TITLE": "comments",
+    "RATING": "Rating"
+  }
+}
