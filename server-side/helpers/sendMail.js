@@ -13,11 +13,11 @@ export default function sendMail(mail, key) {
             html: mailTemplate
                 .replace("xxx@xxxx", `${mail}`)
                 .replace("link@link1",
-                    `https://de-teacher-app.herokuapp.com/verify-email/${key}`)
+                    `https://sprachlehrer.herokuapp.com/verify-email/${key}`)
                 .replace("link@link2",
-                    `https://de-teacher-app.herokuapp.com/verify-email/${key}`)
+                    `https://sprachlehrer.herokuapp.com/verify-email/${key}`)
                 .replace("link@link3",
-                    `https://de-teacher-app.herokuapp.com/verify-email/${key}`)
+                    `https://sprachlehrer.herokuapp.com/verify-email/${key}`)
         };
 
         (async () => {
